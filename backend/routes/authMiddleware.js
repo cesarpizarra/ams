@@ -12,18 +12,20 @@ function verifyToken(req, res, next) {
     process.env.JWT_SECRET,
     (err, decoded) => {
       if (err) {
+        console.error("JWT verification error:", err);
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       // Check if the teacher handles the requested grade and section
       if (
-        decoded.role === "teacher" &&
-        decoded.grades.includes(req.params.grade) &&
+        decoded.role === "teacher" ||
+        decoded.grades.includes(req.params.grade) ||
         decoded.sections.includes(req.params.section)
       ) {
         req.user = decoded;
         next();
       } else {
+        console.log("Access denied");
         return res.status(403).json({ message: "Access denied" });
       }
     }
