@@ -12,14 +12,12 @@ router.post("/:grade/:section/add", verifyToken, async (req, res) => {
         .json({ message: "Only teachers can add students" });
     }
 
-    // Create a new student with both grade and section
     const student = new Student({
       name: req.body.name,
       grade: req.params.grade,
       section: req.params.section,
     });
 
-    // Save the student to the database
     await student.save();
 
     res.status(201).json({ message: "Student added successfully" });
@@ -32,7 +30,6 @@ router.post("/:grade/:section/add", verifyToken, async (req, res) => {
 // Route to retrieve a list of students for a specific grade and section
 router.get("/:grade/:section/students", verifyToken, async (req, res) => {
   try {
-    // Check if the user is a teacher and has access to the requested grade and section
     if (
       req.user.role === "teacher" &&
       req.user.grades.includes(parseInt(req.params.grade)) &&

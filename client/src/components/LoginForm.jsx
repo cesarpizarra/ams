@@ -20,14 +20,9 @@ const LoginForm = ({ onLogin }) => {
 
       const { token } = response.data;
 
-      // Save the token to local storage
       localStorage.setItem("token", token);
 
-      // Call the onLogin function passed from the parent component
       onLogin(token);
-
-      // Redirect to the dashboard or any other authenticated route
-      // You can use React Router for navigation
     } catch (error) {
       console.error("Login error:", error);
       setError("Invalid username or password.");
