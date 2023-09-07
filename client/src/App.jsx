@@ -6,7 +6,8 @@ import {
   Routes,
 } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import StudentList from "./components/StudentList";
+import StudentListContainer from "./components/StudentListContainer";
+import StudentDetails from "./components/StudentDetails"; // Import the StudentDetails component
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -15,19 +16,19 @@ const App = () => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    const storedGrades = localStorage.getItem("grades");
-    const storedSections = localStorage.getItem("sections");
+    const storedGrades = JSON.parse(localStorage.getItem("grades")) || [];
+    const storedSections = JSON.parse(localStorage.getItem("sections")) || [];
 
     if (storedToken) {
       setToken(storedToken);
     }
 
     if (storedGrades) {
-      setGrades(JSON.parse(storedGrades));
+      setGrades(storedGrades);
     }
 
     if (storedSections) {
-      setSections(JSON.parse(storedSections));
+      setSections(storedSections);
     }
   }, []);
 
@@ -52,15 +53,18 @@ const App = () => {
           path="/students"
           element={
             token ? (
-              <>
-                <StudentList token={token} grade={7} section={1} />
-                <StudentList token={token} grade={7} section={2} />
-              </>
+              <StudentListContainer
+                token={token}
+                grades={grades}
+                sections={sections}
+              />
             ) : (
               <Navigate to="/" />
             )
           }
         />
+        {/* Add a new route for StudentDetails */}
+        <Route path="/student/:studentId" element={<StudentDetails />} />
       </Routes>
     </Router>
   );

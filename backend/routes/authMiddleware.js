@@ -18,14 +18,14 @@ function verifyToken(req, res, next) {
 
       // Check if the teacher handles the requested grade and section
       if (
-        decoded.role === "teacher" &&
-        decoded.grades.includes(parseInt(req.params.grade)) &&
+        decoded.role === "teacher" ||
+        decoded.grades.includes(parseInt(req.params.grade)) ||
         decoded.sections.includes(parseInt(req.params.section))
       ) {
         req.user = decoded;
         next();
       } else {
-        console.log("Access denied");
+        console.log("Access denied ");
         return res.status(403).json({ message: "Access denied" });
       }
     }

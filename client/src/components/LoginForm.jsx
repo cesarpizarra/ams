@@ -18,11 +18,10 @@ const LoginForm = ({ onLogin }) => {
         }
       );
 
-      const { token } = response.data;
+      const { token, role } = response.data;
 
       localStorage.setItem("token", token);
-
-      onLogin(token);
+      onLogin(token, role);
     } catch (error) {
       console.error("Login error:", error);
       setError("Invalid username or password.");
