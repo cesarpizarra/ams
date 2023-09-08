@@ -1,30 +1,98 @@
 import React from "react";
-import { saveSvgAsPng } from "save-svg-as-png"; // Import SVG to PNG conversion library
 import QRCode from "react-qr-code";
+import { PDFDocument, rgb, degrees } from "pdf-lib";
+import { toPng } from "html-to-image";
+import logoImage from "../assets/logo-image.png";
+import backgroundImage from "../assets/bg-image.png";
 
 const StudentDetails = ({ student, onClose }) => {
-  // Function to download the QR code as PNG
-  const downloadQRCode = () => {
+  const downloadIDCard = async () => {
     const fullName = `${student.firstName} ${student.middleName} ${student.lastName}`;
-    const idCardInfo = `${fullName}\nGrade: ${student.grade}\nSection: ${student.section}`;
-    const svgElement = document.getElementById("qrcode-svg"); // Get the QR code SVG element
-    const pngFilename = `${fullName}_IDCard_qrcode.png`; // Define a filename for the PNG
+    const grade = `Grade: ${student.grade}`;
+    const section = `Section: ${student.section}`;
 
-    // Convert and save the QR code as a PNG with the ID card information as its value
-    saveSvgAsPng(svgElement, pngFilename, {
-      scale: 4,
-      encoderOptions: 1.0, // Higher quality to ensure text is readable
-      customDownload: (dataUri, filename) => {
-        // Create a link and trigger a click event to download the PNG
-        const link = document.createElement("a");
-        link.href = dataUri;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      },
-      value: idCardInfo, // Set the value of the QR code
+    const pdfDoc = await PDFDocument.create();
+
+    const page = pdfDoc.addPage([400, 200]); // Adjust the page size
+
+    // Load the background image
+    const backgroundImageData = await fetch(backgroundImage).then((res) =>
+      res.arrayBuffer()
+    );
+    const backgroundImageEmbed = await pdfDoc.embedPng(backgroundImageData);
+
+    // Draw the background image
+    const { width, height } = page.getSize();
+    page.drawImage(backgroundImageEmbed, {
+      x: 0,
+      y: 0,
+      width,
+      height,
     });
+
+    // Calculate positions for logo and QR code
+    const logoX = 20;
+    const logoY = height - 120;
+    const qrCodeX = width - 120;
+    const qrCodeY = height - 120;
+    const elementWidth = 100;
+
+    // Embed the logo image on the left side
+    const logoImageData = await fetch(logoImage).then((res) =>
+      res.arrayBuffer()
+    );
+    const logoImageEmbed = await pdfDoc.embedPng(logoImageData);
+    page.drawImage(logoImageEmbed, {
+      x: logoX,
+      y: logoY,
+      width: elementWidth,
+      height: elementWidth,
+      rotation: degrees(0),
+    });
+
+    // Convert the QR code SVG to a PNG image and adjust the size
+    const svgElement = document.getElementById("qrcode-svg");
+    const pngDataUrl = await toPng(svgElement, { width: 100 }); // Adjust QR code size
+
+    // Embed the QR code image in the PDF on the right side
+    const pngImage = await pdfDoc.embedPng(pngDataUrl);
+    const pngDims = pngImage.scale(0.75); // Adjust QR code size
+    page.drawImage(pngImage, {
+      x: qrCodeX,
+      y: qrCodeY,
+      width: pngDims.width,
+      height: pngDims.height,
+    });
+
+    // Add styled text to the PDF at the bottom
+    page.drawText(fullName, {
+      x: 20,
+      y: 15,
+      size: 14,
+      color: rgb(1, 1, 1),
+    });
+    page.drawText(grade, {
+      x: 20,
+      y: 40,
+      size: 12,
+      color: rgb(1, 1, 1),
+    });
+    page.drawText(section, {
+      x: 20,
+      y: 60,
+      size: 12,
+      color: rgb(1, 1, 1),
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const pdfFilename = `${fullName}_IDCard.pdf`;
+
+    const link = document.createElement("a");
+    link.href = pdfUrl;
+    link.download = pdfFilename;
+    link.click();
   };
 
   return (
@@ -46,17 +114,16 @@ const StudentDetails = ({ student, onClose }) => {
         <div>
           <strong>Section:</strong> {student.section}
         </div>
-        {/* QR Code */}
         <div className="mt-4">
           <strong>QR Code:</strong>
           <div>
             <QRCode id="qrcode-svg" value={student._id} size={128} />
           </div>
           <button
-            onClick={downloadQRCode}
+            onClick={downloadIDCard}
             className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
           >
-            Download ID Card
+            Download ID Card as PDF
           </button>
         </div>
         <button

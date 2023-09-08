@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddStudent from "./AddStudent";
-import StudentDetails from "./StudentDetails"; // New component for viewing student details
+import StudentDetails from "./StudentDetails";
 
 const StudentList = ({ token, grade, section }) => {
   const [students, setStudents] = useState([]);
