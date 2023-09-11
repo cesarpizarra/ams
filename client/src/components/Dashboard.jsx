@@ -26,9 +26,6 @@ const Dashboard = ({ children }) => {
             <Link to="/students">List of Students</Link>
           </li>
           <li className="px-4 py-2">
-            <Link to="/add-student">Add Student</Link>
-          </li>
-          <li className="px-4 py-2">
             <button onClick={() => setIsLogoutModalOpen(true)}>Logout</button>
           </li>
         </ul>

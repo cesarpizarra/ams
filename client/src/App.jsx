@@ -9,7 +9,6 @@ import {
 import LoginForm from "./components/LoginForm";
 import StudentListContainer from "./components/StudentListContainer";
 import Dashboard from "./components/Dashboard";
-import AddStudent from "./components/AddStudent";
 import StudentDetails from "./components/StudentDetails";
 
 const App = () => {
@@ -61,22 +60,6 @@ const App = () => {
                   token={token}
                   grades={grades}
                   sections={sections}
-                />
-              </Dashboard>
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        <Route
-          path="/add-student"
-          element={
-            token ? (
-              <Dashboard>
-                <AddStudent
-                  token={token}
-                  grades={grades} // Pass grades here
-                  sections={sections} // Pass sections here
                 />
               </Dashboard>
             ) : (

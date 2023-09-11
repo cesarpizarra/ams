@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddStudent from "./AddStudent";
+import { useNavigate } from "react-router-dom";
+import QRCode from "react-qr-code";
 import StudentDetails from "./StudentDetails";
 
 const StudentList = ({ token, grade, section }) => {
@@ -8,10 +10,13 @@ const StudentList = ({ token, grade, section }) => {
   const [loading, setLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState(null);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null); // Define selectedStudent state
 
   const grades = [7, 8, 9, 10, 11, 12];
   const sections = [1, 2];
+
+  const navigate = useNavigate();
 
   const fetchStudents = async () => {
     try {
@@ -49,28 +54,6 @@ const StudentList = ({ token, grade, section }) => {
     }));
   };
 
-  const deleteStudent = async (studentId) => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:3000/api/student/${grade}/${section}/delete/${studentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        // Student deleted successfully, refresh the student list
-        fetchStudents();
-      } else {
-        console.error("Delete student error:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Delete student error:", error);
-    }
-  };
-
   const openEditModal = (student) => {
     setEditingStudent(student);
   };
@@ -79,35 +62,9 @@ const StudentList = ({ token, grade, section }) => {
     setEditingStudent(null);
   };
 
-  const updateStudent = async () => {
-    try {
-      const response = await axios.put(
-        `http://localhost:3000/api/student/${editingStudent.grade}/${editingStudent.section}/update/${editingStudent._id}`,
-        editingStudent,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        // Student updated successfully, close the modal and refresh the student list
-        closeEditModal();
-        fetchStudents();
-      }
-    } catch (error) {
-      console.error("Update student error:", error);
-    }
-  };
-
   const viewStudentDetails = (student) => {
     setSelectedStudent(student);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="w-full max-w-[1240px] mx-auto p-6">
@@ -122,8 +79,18 @@ const StudentList = ({ token, grade, section }) => {
               onStudentAdded={() => {
                 toggleAddStudentModal();
                 fetchStudents();
+                setIsSuccessModalOpen(true);
               }}
+              setIsAddStudentModalOpen={setIsAddStudentModalOpen}
             />
+          </div>
+        </div>
+      )}
+      {isSuccessModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Success!</h2>
+            <p className="text-green-600">Student added successfully.</p>
           </div>
         </div>
       )}

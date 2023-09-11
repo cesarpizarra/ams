@@ -1,87 +1,56 @@
-import React from "react";
+import React, { useRef } from "react";
 import QRCode from "react-qr-code";
-import { PDFDocument, rgb, degrees } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 import { toPng } from "html-to-image";
-import logoImage from "../assets/logo-image.png";
-import backgroundImage from "../assets/bg-image.png";
 
 const StudentDetails = ({ student, onClose }) => {
+  const qrCodeRef = useRef(null);
+
   const downloadIDCard = async () => {
     const fullName = `${student.firstName} ${student.middleName} ${student.lastName}`;
     const grade = `Grade: ${student.grade}`;
     const section = `Section: ${student.section}`;
 
     const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([200, 300]); // Adjust the page size to portrait
 
-    const page = pdfDoc.addPage([400, 200]); // Adjust the page size
+    // Calculate positions for QR code and text
+    const qrCodeX = 50;
+    const qrCodeY = 150;
+    const textX = 20;
+    const textY = 100;
 
-    // Load the background image
-    const backgroundImageData = await fetch(backgroundImage).then((res) =>
-      res.arrayBuffer()
-    );
-    const backgroundImageEmbed = await pdfDoc.embedPng(backgroundImageData);
+    // Convert the QR code SVG to a data URL using html-to-image
+    const qrCodeDataUrl = await toPng(qrCodeRef.current);
 
-    // Draw the background image
-    const { width, height } = page.getSize();
-    page.drawImage(backgroundImageEmbed, {
-      x: 0,
-      y: 0,
-      width,
-      height,
-    });
-
-    // Calculate positions for logo and QR code
-    const logoX = 20;
-    const logoY = height - 120;
-    const qrCodeX = width - 120;
-    const qrCodeY = height - 120;
-    const elementWidth = 100;
-
-    // Embed the logo image on the left side
-    const logoImageData = await fetch(logoImage).then((res) =>
-      res.arrayBuffer()
-    );
-    const logoImageEmbed = await pdfDoc.embedPng(logoImageData);
-    page.drawImage(logoImageEmbed, {
-      x: logoX,
-      y: logoY,
-      width: elementWidth,
-      height: elementWidth,
-      rotation: degrees(0),
-    });
-
-    // Convert the QR code SVG to a PNG image and adjust the size
-    const svgElement = document.getElementById("qrcode-svg");
-    const pngDataUrl = await toPng(svgElement, { width: 100 }); // Adjust QR code size
-
-    // Embed the QR code image in the PDF on the right side
-    const pngImage = await pdfDoc.embedPng(pngDataUrl);
-    const pngDims = pngImage.scale(0.75); // Adjust QR code size
-    page.drawImage(pngImage, {
+    // Embed the QR code image in the PDF
+    const qrCodeImage = await pdfDoc.embedPng(qrCodeDataUrl);
+    const qrCodeDims = qrCodeImage.scale(0.75); // Adjust QR code size
+    page.drawImage(qrCodeImage, {
       x: qrCodeX,
       y: qrCodeY,
-      width: pngDims.width,
-      height: pngDims.height,
+      width: qrCodeDims.width,
+      height: qrCodeDims.height,
     });
 
-    // Add styled text to the PDF at the bottom
+    // Add styled text to the PDF
     page.drawText(fullName, {
-      x: 20,
-      y: 15,
+      x: textX,
+      y: textY,
       size: 14,
-      color: rgb(1, 1, 1),
+      color: rgb(0, 0, 0), // Black color
     });
     page.drawText(grade, {
-      x: 20,
-      y: 40,
+      x: textX,
+      y: textY - 30,
       size: 12,
-      color: rgb(1, 1, 1),
+      color: rgb(0, 0, 0), // Black color
     });
     page.drawText(section, {
-      x: 20,
-      y: 60,
+      x: textX,
+      y: textY - 50,
       size: 12,
-      color: rgb(1, 1, 1),
+      color: rgb(0, 0, 0), // Black color
     });
 
     const pdfBytes = await pdfDoc.save();
@@ -116,8 +85,8 @@ const StudentDetails = ({ student, onClose }) => {
         </div>
         <div className="mt-4">
           <strong>QR Code:</strong>
-          <div>
-            <QRCode id="qrcode-svg" value={student._id} size={128} />
+          <div ref={qrCodeRef}>
+            <QRCode value={student._id} size={128} />
           </div>
           <button
             onClick={downloadIDCard}

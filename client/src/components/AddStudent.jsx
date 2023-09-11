@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
-const AddStudent = ({ token, grade, section, onStudentAdded }) => {
+const AddStudent = ({
+  token,
+  grade,
+  section,
+  onStudentAdded,
+  setIsAddStudentModalOpen,
+}) => {
   const [newStudent, setNewStudent] = useState({
     firstName: "",
     middleName: "",
@@ -23,6 +30,21 @@ const AddStudent = ({ token, grade, section, onStudentAdded }) => {
   };
 
   const addStudent = async () => {
+    // Check if all required fields are filled
+    if (
+      !newStudent.firstName ||
+      !newStudent.lastName ||
+      !newStudent.grade ||
+      !newStudent.section
+    ) {
+      // Display a sweetalert error message indicating that all required fields must be filled
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please fill in all required fields.",
+      });
+      return;
+    }
     try {
       const response = await axios.post(
         `http://localhost:3000/api/student/${grade}/${section}/add`,
@@ -33,6 +55,8 @@ const AddStudent = ({ token, grade, section, onStudentAdded }) => {
           },
         }
       );
+
+      console.log("Response status:", response.status);
 
       if (response.status === 201) {
         // Student added successfully, clear the input fields
@@ -57,20 +81,9 @@ const AddStudent = ({ token, grade, section, onStudentAdded }) => {
     }
   };
 
-  useEffect(() => {
-    if (isSuccessModalOpen) {
-      // Close the success modal after 3 seconds
-      const timer = setTimeout(() => {
-        setIsSuccessModalOpen(false);
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isSuccessModalOpen]);
-
   return (
     <div>
-      <div className=" mb-4">
+      <div className="mb-4">
         <div className="w-1/3 flex gap-4">
           <input
             type="text"
@@ -78,7 +91,7 @@ const AddStudent = ({ token, grade, section, onStudentAdded }) => {
             placeholder="First Name"
             value={newStudent.firstName}
             onChange={handleInputChange}
-            className="border  rounded px-2 py-1 input-style"
+            className="border rounded px-2 py-1 input-style"
           />
           <input
             type="text"
@@ -135,7 +148,10 @@ const AddStudent = ({ token, grade, section, onStudentAdded }) => {
           >
             Add Student
           </button>
-          <button className="bg-gray-500 text-white px-4 py-2 rounded ml-2">
+          <button
+            onClick={() => setIsAddStudentModalOpen(false)}
+            className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+          >
             Cancel
           </button>
         </div>
