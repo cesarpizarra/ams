@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Logo from "../assets/logo.png";
 import { BsEyeFill, BsEyeSlashFill } from "react-icons/bs";
+import Swal from "sweetalert2";
 
 const LoginForm = ({ onLogin }) => {
   const [username, setUsername] = useState("");
@@ -25,9 +26,25 @@ const LoginForm = ({ onLogin }) => {
 
       localStorage.setItem("token", token);
       onLogin(token, role);
+
+      // Show a success SweetAlert
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        text: "Welcome back!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (error) {
       console.error("Login error:", error);
-      setError("Invalid username or password.");
+
+      // Show an error SweetAlert for failed login attempts
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Invalid username or password",
+        showConfirmButton: true,
+      });
     }
   };
 
@@ -88,7 +105,7 @@ const LoginForm = ({ onLogin }) => {
               </button>
             </div>
           </div>
-          {error && <p className="text-red-600">{error}</p>}
+
           <div>
             <button
               type="button"

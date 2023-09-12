@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddStudent from "./AddStudent";
-import { useNavigate } from "react-router-dom";
-import QRCode from "react-qr-code";
 import StudentDetails from "./StudentDetails";
+import Swal from "sweetalert2";
 
 const StudentList = ({ token, grade, section }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState(null);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null); // Define selectedStudent state
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   const grades = [7, 8, 9, 10, 11, 12];
   const sections = [1, 2];
-
-  const navigate = useNavigate();
 
   const fetchStudents = async () => {
     try {
@@ -54,12 +50,79 @@ const StudentList = ({ token, grade, section }) => {
     }));
   };
 
+  const deleteStudent = async (studentId) => {
+    try {
+      const response = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel",
+      });
+
+      if (response.isConfirmed) {
+        // User clicked "Yes, delete it!" in the SweetAlert
+        const deleteResponse = await axios.delete(
+          `http://localhost:3000/api/student/${grade}/${section}/delete/${studentId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (deleteResponse.status === 200) {
+          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          fetchStudents(); // Refresh the student list
+        } else {
+          console.error("Delete student error:", deleteResponse.data.message);
+        }
+      } else if (response.dismiss === Swal.DismissReason.cancel) {
+        // User clicked "No, cancel" in the SweetAlert
+        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+      }
+    } catch (error) {
+      console.error("Delete student error:", error);
+    }
+  };
+
   const openEditModal = (student) => {
     setEditingStudent(student);
   };
 
   const closeEditModal = () => {
     setEditingStudent(null);
+  };
+
+  const updateStudent = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/student/${editingStudent.grade}/${editingStudent.section}/update/${editingStudent._id}`,
+        editingStudent,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        closeEditModal();
+        fetchStudents();
+        Swal.fire({
+          icon: "success",
+          title: "Updated Successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error("Update student error:", error);
+    }
   };
 
   const viewStudentDetails = (student) => {
@@ -79,21 +142,13 @@ const StudentList = ({ token, grade, section }) => {
               onStudentAdded={() => {
                 toggleAddStudentModal();
                 fetchStudents();
-                setIsSuccessModalOpen(true);
               }}
               setIsAddStudentModalOpen={setIsAddStudentModalOpen}
             />
           </div>
         </div>
       )}
-      {isSuccessModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Success!</h2>
-            <p className="text-green-600">Student added successfully.</p>
-          </div>
-        </div>
-      )}
+
       {selectedStudent && (
         <StudentDetails
           student={selectedStudent}
@@ -159,7 +214,7 @@ const StudentList = ({ token, grade, section }) => {
       {/* Edit Student Modal */}
       {editingStudent && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded shadow-lg">
+          <div className="flex flex-col bg-white p-4 rounded shadow-lg w-96 gap-2">
             <h2 className="text-2xl font-bold mb-4">Edit Student</h2>
             <input
               type="text"
@@ -167,7 +222,7 @@ const StudentList = ({ token, grade, section }) => {
               placeholder="First Name"
               value={editingStudent.firstName}
               onChange={(e) => handleEditInputChange(e, "firstName")}
-              className="border rounded px-2 py-1 mb-2"
+              className="border rounded px-2 py-1 mb-2 input-style"
             />
             <input
               type="text"
@@ -175,7 +230,7 @@ const StudentList = ({ token, grade, section }) => {
               placeholder="Middle Name"
               value={editingStudent.middleName}
               onChange={(e) => handleEditInputChange(e, "middleName")}
-              className="border rounded px-2 py-1 mb-2"
+              className="border rounded px-2 py-1 mb-2 input-style"
             />
             <input
               type="text"
@@ -183,13 +238,13 @@ const StudentList = ({ token, grade, section }) => {
               placeholder="Last Name"
               value={editingStudent.lastName}
               onChange={(e) => handleEditInputChange(e, "lastName")}
-              className="border rounded px-2 py-1 mb-2"
+              className="border rounded px-2 py-1 mb-2 input-style"
             />
             <select
               name="grade"
               value={editingStudent.grade}
               onChange={(e) => handleEditInputChange(e, "grade")}
-              className="border rounded px-2 py-1 mb-2"
+              className="border rounded px-2 py-1 mb-2 input-style"
             >
               <option value="">Select Grade</option>
               {grades.map((grade) => (
@@ -202,7 +257,7 @@ const StudentList = ({ token, grade, section }) => {
               name="section"
               value={editingStudent.section}
               onChange={(e) => handleEditInputChange(e, "section")}
-              className="border rounded px-2 py-1 mb-2"
+              className="border rounded px-2 py-1 mb-2 input-style"
             >
               <option value="">Select Section</option>
               {sections.map((section) => (
@@ -219,7 +274,7 @@ const StudentList = ({ token, grade, section }) => {
             </button>
             <button
               onClick={closeEditModal}
-              className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+              className="bg-gray-500 text-white px-4 py-2 rounded "
             >
               Cancel
             </button>

@@ -72,9 +72,14 @@ const AddStudent = ({
         if (onStudentAdded) {
           onStudentAdded();
         }
-
-        // Show the success modal
-        setIsSuccessModalOpen(true);
+        if (onStudentAdded) {
+          Swal.fire({
+            icon: "success",
+            title: "Added Successfully",
+            text: "You have successfully add student.",
+          });
+          return;
+        }
       }
     } catch (error) {
       console.error("Add student error:", error);

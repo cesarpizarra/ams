@@ -1,14 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import logo from "../assets/logo-image.png";
-import LogoutModal from "../components/modals/LogoutModal";
 
 const Dashboard = ({ children }) => {
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    history.push("/");
+    console.log("Logout button clicked");
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token");
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 100);
+      }
+    });
   };
 
   return (
@@ -26,20 +41,13 @@ const Dashboard = ({ children }) => {
             <Link to="/students">List of Students</Link>
           </li>
           <li className="px-4 py-2">
-            <button onClick={() => setIsLogoutModalOpen(true)}>Logout</button>
+            <button onClick={handleLogout}>Logout</button>
           </li>
         </ul>
       </nav>
 
       {/* Right Content */}
       <div className="flex-grow p-6">{children}</div>
-
-      {/* Logout Modal */}
-      <LogoutModal
-        isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
-        onLogout={handleLogout}
-      />
     </div>
   );
 };
