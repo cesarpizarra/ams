@@ -115,14 +115,6 @@ const LoginForm = ({ onLogin }) => {
               Sign In
             </button>
           </div>
-          <div className="text-center">
-            <a
-              href="#"
-              className="text-indigo-600 hover:text-indigo-700 text-sm font-semibold"
-            >
-              Forgot your password?
-            </a>
-          </div>
         </form>
       </div>
     </div>

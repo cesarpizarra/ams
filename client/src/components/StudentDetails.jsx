@@ -2,30 +2,44 @@ import React, { useRef } from "react";
 import QRCode from "react-qr-code";
 import { PDFDocument, rgb } from "pdf-lib";
 import { toPng } from "html-to-image";
+import BorderIdCard from "../assets/border.png";
 
 const StudentDetails = ({ student, onClose }) => {
   const qrCodeRef = useRef(null);
 
   const downloadIDCard = async () => {
+    const schoolName = "LNHS";
     const fullName = `${student.firstName} ${student.middleName} ${student.lastName}`;
     const grade = `Grade: ${student.grade}`;
     const section = `Section: ${student.section}`;
 
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([200, 300]); // Adjust the page size to portrait
+    const page = pdfDoc.addPage([200, 320]);
 
-    // Calculate positions for QR code and text
-    const qrCodeX = 50;
-    const qrCodeY = 150;
-    const textX = 20;
-    const textY = 100;
+    // Load the background image
+    const backgroundUrl = await fetch(BorderIdCard);
+    const backgroundData = await backgroundUrl.arrayBuffer();
+    const backgroundImage = await pdfDoc.embedPng(backgroundData);
+
+    // Scale the background image to fit the page dimensions
+    const imageSize = backgroundImage.scale(1);
+
+    // Draw the background image
+    page.drawImage(backgroundImage, {
+      x: 0,
+      y: 0,
+      width: imageSize.width,
+      height: imageSize.height,
+    });
 
     // Convert the QR code SVG to a data URL using html-to-image
     const qrCodeDataUrl = await toPng(qrCodeRef.current);
 
     // Embed the QR code image in the PDF
     const qrCodeImage = await pdfDoc.embedPng(qrCodeDataUrl);
-    const qrCodeDims = qrCodeImage.scale(0.75); // Adjust QR code size
+    const qrCodeDims = qrCodeImage.scale(0.75);
+    const qrCodeX = 50;
+    const qrCodeY = 150;
     page.drawImage(qrCodeImage, {
       x: qrCodeX,
       y: qrCodeY,
@@ -33,24 +47,41 @@ const StudentDetails = ({ student, onClose }) => {
       height: qrCodeDims.height,
     });
 
+    // Calculate the center X-coordinate of the QR code
+    const qrCodeCenterX = qrCodeX + qrCodeDims.width / 4.5;
+
+    // Calculate the X-coordinate for the school name to center it above the QR code
+    const schoolNameX = qrCodeCenterX - schoolName.length * 3;
+
+    // Calculate the Y-coordinate for the school name above the QR code
+    const schoolNameY = qrCodeY + qrCodeDims.height + 15;
+
+    // Add the school name to the PDF above the QR code
+    page.drawText(schoolName, {
+      x: schoolNameX,
+      y: schoolNameY,
+      size: 20,
+      color: rgb(0, 0, 0),
+    });
+
     // Add styled text to the PDF
     page.drawText(fullName, {
-      x: textX,
-      y: textY,
+      x: 20,
+      y: 100,
       size: 14,
-      color: rgb(0, 0, 0), // Black color
+      color: rgb(0, 0, 0),
     });
     page.drawText(grade, {
-      x: textX,
-      y: textY - 30,
+      x: 20,
+      y: 70,
       size: 12,
-      color: rgb(0, 0, 0), // Black color
+      color: rgb(0, 0, 0),
     });
     page.drawText(section, {
-      x: textX,
-      y: textY - 50,
+      x: 20,
+      y: 50,
       size: 12,
-      color: rgb(0, 0, 0), // Black color
+      color: rgb(0, 0, 0),
     });
 
     const pdfBytes = await pdfDoc.save();
@@ -66,7 +97,7 @@ const StudentDetails = ({ student, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded shadow-lg">
+      <div className="bg-white p-12 rounded shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Student Details</h2>
         <div>
           <strong>First Name:</strong> {student.firstName}
@@ -90,14 +121,14 @@ const StudentDetails = ({ student, onClose }) => {
           </div>
           <button
             onClick={downloadIDCard}
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+            className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
           >
             Download ID Card as PDF
           </button>
         </div>
         <button
           onClick={onClose}
-          className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+          className="bg-gray-500 text-white px-4 py-2 rounded mt-4"
         >
           Close
         </button>

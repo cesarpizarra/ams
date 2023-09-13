@@ -3,7 +3,7 @@ import axios from "axios";
 import AddStudent from "./AddStudent";
 import StudentDetails from "./StudentDetails";
 import Swal from "sweetalert2";
-
+import { AiFillPlusCircle } from "react-icons/ai";
 const StudentList = ({ token, grade, section }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -159,15 +159,18 @@ const StudentList = ({ token, grade, section }) => {
         <h2 className="text-2xl font-bold mb-4">List of Students</h2>
         <button
           onClick={toggleAddStudentModal}
-          className="bg-green-500 text-white px-2 py-1 rounded mb-2"
+          className="bg-blue-500 text-white px-2 py-1 rounded mb-2 flex items-center gap-2"
         >
+          <span>
+            <AiFillPlusCircle />
+          </span>
           Add Student
         </button>
       </div>
       <table className="table-auto w-full">
-        <thead className=" text-left">
+        <thead className=" text-left bg-gray-500 text-white">
           <tr>
-            <th className="py-2">First Name</th>
+            <th className="py-2 px-2">First Name</th>
             <th className="py-2">Middle Name</th>
             <th className="py-2">Last Name</th>
             <th className="py-2">Grade</th>
@@ -198,7 +201,7 @@ const StudentList = ({ token, grade, section }) => {
                   Delete
                 </button>
               </td>
-              <td className="px-4 py-2">
+              <td className=" py-2">
                 <button
                   onClick={() => viewStudentDetails(student)}
                   className="bg-green-500 text-white px-2 py-1 rounded"

@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
@@ -8,7 +9,6 @@ import {
 import LoginForm from "./components/LoginForm";
 import StudentListContainer from "./components/StudentListContainer";
 import Dashboard from "./components/Dashboard";
-import StudentDetails from "./components/StudentDetails";
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -40,7 +40,7 @@ const App = () => {
           path="/"
           element={
             token ? (
-              <Navigate to="/dashboard" />
+              <Navigate to="/students" />
             ) : (
               <LoginForm
                 onLogin={setToken}
@@ -83,8 +83,6 @@ const App = () => {
             )
           }
         />
-        {/* Add a new route for StudentDetails */}
-        <Route path="/student/:studentId" element={<StudentDetails />} />
       </Routes>
     </Router>
   );

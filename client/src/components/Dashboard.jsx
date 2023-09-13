@@ -5,8 +5,6 @@ import logo from "../assets/logo-image.png";
 
 const Dashboard = ({ children }) => {
   const handleLogout = () => {
-    console.log("Logout button clicked");
-
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -37,10 +35,13 @@ const Dashboard = ({ children }) => {
           </span>
         </div>
         <ul className="p-2">
-          <li className="px-4 py-2 border-b">
+          <li className="px-4 py-2 border-b-2 border-gray-300">
             <Link to="/students">List of Students</Link>
           </li>
-          <li className="px-4 py-2">
+          <li className="px-4 py-2 border-b-2 border-gray-300">
+            <Link to="/students">Attendance</Link>
+          </li>
+          <li className="px-4 py-2 border-b-2 border-gray-300">
             <button onClick={handleLogout}>Logout</button>
           </li>
         </ul>
