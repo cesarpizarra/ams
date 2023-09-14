@@ -22,9 +22,14 @@ const LoginForm = ({ onLogin }) => {
         }
       );
 
-      const { token, role } = response.data;
+      const { token, role, grades, sections } = response.data;
+
+      console.log("Grades:", grades);
+      console.log("Sections:", sections);
 
       localStorage.setItem("token", token);
+      localStorage.setItem("grades", grades);
+      localStorage.setItem("sections", sections);
       onLogin(token, role);
 
       // Show a success SweetAlert

@@ -57,14 +57,19 @@ exports.login = async (req, res) => {
         userId: user._id,
         username: user.username,
         role: user.role,
-        grades: user.grades,
-        sections: user.sections,
+        grades: user.grades, // Include grades data
+        sections: user.sections, // Include sections data
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    res.status(200).json({ message: "Logged in Successfully", token });
+    res.status(200).json({
+      message: "Logged in Successfully",
+      token,
+      grades: user.grades, // Include grades data in response
+      sections: user.sections, // Include sections data in response
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Authentication failed" });
