@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import logo from "../assets/logo-image.png";
-
+import { BiLogOut, BiListOl, BiSolidTime } from "react-icons/bi";
 const Dashboard = ({ children }) => {
   const handleLogout = () => {
     Swal.fire({
@@ -34,15 +34,30 @@ const Dashboard = ({ children }) => {
             Dashboard
           </span>
         </div>
-        <ul className="p-2">
+        <ul className="p-2 ">
           <li className="px-4 py-2 border-b-2 border-gray-300">
-            <Link to="/students">List of Students</Link>
+            <Link to="/students" className="flex items-center gap-2">
+              <span>
+                <BiListOl />
+              </span>
+              List of Students
+            </Link>
           </li>
           <li className="px-4 py-2 border-b-2 border-gray-300">
-            <Link to="/students">Attendance</Link>
+            <Link to="/students" className="flex items-center gap-2">
+              <span>
+                <BiSolidTime />
+              </span>
+              Attendance
+            </Link>
           </li>
-          <li className="px-4 py-2 border-b-2 border-gray-300">
-            <button onClick={handleLogout}>Logout</button>
+          <li className="px-4 py-2 border-b-2 border-gray-300 ">
+            <button onClick={handleLogout} className="flex items-center gap-2">
+              <span>
+                <BiLogOut />
+              </span>
+              Logout
+            </button>
           </li>
         </ul>
       </nav>
