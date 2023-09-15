@@ -7,7 +7,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import StudentListContainer from "./components/StudentListContainer";
+import StudentListContainer from "./pages/StudentListContainer";
 import Dashboard from "./components/Dashboard";
 
 const App = () => {

@@ -25,7 +25,7 @@ const Dashboard = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-200">
+    <div className="flex h-screen bg-gray-200 ">
       {/* Left Sidebar */}
       <nav className="w-64 bg-white border-r overflow-y-auto">
         <div className="flex items-center gap-4 p-4">

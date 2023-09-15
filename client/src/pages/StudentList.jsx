@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import AddStudent from "./AddStudent";
+import AddStudent from "../components/AddStudent";
 import StudentDetails from "./StudentDetails";
 import Swal from "sweetalert2";
 import { AiFillPlusCircle } from "react-icons/ai";
