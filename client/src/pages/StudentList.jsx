@@ -4,12 +4,14 @@ import AddStudent from "../components/AddStudent";
 import StudentDetails from "./StudentDetails";
 import Swal from "sweetalert2";
 import { AiFillPlusCircle } from "react-icons/ai";
-const StudentList = ({ token, grade, section }) => {
+const StudentList = ({ token }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState(null);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [grade, setGrade] = useState("7"); // Define grade state
+  const [section, setSection] = useState("1"); // Define section state
 
   const grades = [7, 8, 9, 10, 11, 12];
   const sections = [1, 2];
@@ -17,7 +19,7 @@ const StudentList = ({ token, grade, section }) => {
   const fetchStudents = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/student/${grade}/${section}/students`,
+        `http://localhost:3000/api/student/${grade}/${section}/students`, // Use grade and section in the API request
         {
           headers: {
             Authorization: `Bearer ${token}`,

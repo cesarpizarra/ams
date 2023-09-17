@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { PDFDocument, rgb } from "pdf-lib";
 import { toPng } from "html-to-image";
@@ -6,6 +6,7 @@ import BorderIdCard from "../assets/border.png";
 
 const StudentDetails = ({ student, onClose }) => {
   const qrCodeRef = useRef(null);
+  const [scannedFullName, setScannedFullName] = useState(null);
 
   const downloadIDCard = async () => {
     const schoolName = "LNHS";
@@ -87,12 +88,16 @@ const StudentDetails = ({ student, onClose }) => {
     const pdfBytes = await pdfDoc.save();
     const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
     const pdfUrl = URL.createObjectURL(pdfBlob);
-    const pdfFilename = `${fullName}_IDCard.pdf`;
+    const pdfFilename = `${fullName}_QRCode.pdf`;
 
     const link = document.createElement("a");
     link.href = pdfUrl;
     link.download = pdfFilename;
     link.click();
+  };
+  const handleScan = (data) => {
+    // Assuming that the scanned data is the student's full name
+    setScannedFullName(data);
   };
 
   return (
@@ -117,7 +122,13 @@ const StudentDetails = ({ student, onClose }) => {
         <div className="mt-4">
           <strong>QR Code:</strong>
           <div ref={qrCodeRef}>
-            <QRCode value={student._id} size={128} />
+            <QRCode
+              value={
+                scannedFullName ||
+                `${student.firstName} ${student.middleName} ${student.lastName}`
+              }
+              size={128}
+            />
           </div>
           <button
             onClick={downloadIDCard}
@@ -125,6 +136,13 @@ const StudentDetails = ({ student, onClose }) => {
           >
             Download ID Card as PDF
           </button>
+        </div>
+        <div className="mt-4">
+          {scannedFullName && (
+            <div>
+              <strong>Scanned Full Name:</strong> {scannedFullName}
+            </div>
+          )}
         </div>
         <button
           onClick={onClose}
