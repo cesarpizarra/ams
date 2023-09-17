@@ -1,4 +1,3 @@
-// attendanceController.js
 const Attendance = require("../models/attendance");
 
 exports.recordTimeIn = async (req, res) => {
@@ -11,7 +10,7 @@ exports.recordTimeIn = async (req, res) => {
       studentId,
       timeIn: currentTime,
       date: currentTime.toISOString().slice(0, 10),
-      status: "Present", // Assuming the student is marked as present when they record time in
+      status: "Present",
     });
     await attendanceRecord.save();
 

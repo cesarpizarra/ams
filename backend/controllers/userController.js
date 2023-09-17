@@ -10,8 +10,10 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    if (req.body.role !== "teacher") {
-      return res.status(403).json({ message: "Only teachers can register" });
+    const { role } = req.body;
+
+    if (role !== "admin" && role !== "teacher") {
+      return res.status(403).json({ message: "Invalid role" });
     }
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -20,13 +22,13 @@ exports.register = async (req, res) => {
       username: req.body.username,
       password: hashedPassword,
       role: req.body.role,
-      grades: req.body.grades,
-      sections: req.body.sections,
+      grade: req.body.grade,
+      section: req.body.section,
     });
 
     await user.save();
 
-    res.status(201).json({ message: "Teacher registered successfully" });
+    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Registration failed" });
@@ -57,8 +59,8 @@ exports.login = async (req, res) => {
         userId: user._id,
         username: user.username,
         role: user.role,
-        grades: user.grades, // Include grades data
-        sections: user.sections, // Include sections data
+        grade: user.grade,
+        section: user.section,
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
@@ -67,8 +69,8 @@ exports.login = async (req, res) => {
     res.status(200).json({
       message: "Logged in Successfully",
       token,
-      grades: user.grades, // Include grades data in response
-      sections: user.sections, // Include sections data in response
+      grade: user.grade,
+      section: user.section,
     });
   } catch (error) {
     console.error(error);

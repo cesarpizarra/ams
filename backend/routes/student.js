@@ -34,8 +34,8 @@ router.get("/:grade/:section/students", verifyToken, async (req, res) => {
   try {
     if (
       req.user.role === "teacher" &&
-      req.user.grades.includes(parseInt(req.params.grade)) &&
-      req.user.sections.includes(parseInt(req.params.section))
+      req.user.grade.includes(parseInt(req.params.grade)) &&
+      req.user.section.includes(parseInt(req.params.section))
     ) {
       // Retrieve students for the requested grade and section
       const students = await Student.find({

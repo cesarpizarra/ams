@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// App.jsx
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -6,17 +7,29 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import StudentList from "./pages/StudentList"; // Updated import
+import StudentListContainer from "./pages/StudentListContainer";
 import Dashboard from "./components/Dashboard";
 
 const App = () => {
   const [token, setToken] = useState(null);
+  const [grade, setGrades] = useState([]);
+  const [section, setSections] = useState([]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
+    const storedGrades = JSON.parse(localStorage.getItem("grade"));
+    const storedSections = JSON.parse(localStorage.getItem("section"));
 
     if (storedToken) {
       setToken(storedToken);
+    }
+
+    if (storedGrades) {
+      setGrades(storedGrades);
+    }
+
+    if (storedSections) {
+      setSections(storedSections);
     }
   }, []);
 
@@ -27,9 +40,13 @@ const App = () => {
           path="/"
           element={
             token ? (
-              <Navigate to="/dashboard" />
+              <Navigate to="/students" />
             ) : (
-              <LoginForm onLogin={setToken} />
+              <LoginForm
+                onLogin={setToken}
+                setGrades={setGrades}
+                setSections={setSections}
+              />
             )
           }
         />
@@ -38,7 +55,28 @@ const App = () => {
           element={
             token ? (
               <Dashboard>
-                <StudentList token={token} />
+                <StudentListContainer
+                  token={token}
+                  grade={grade}
+                  section={section}
+                />
+              </Dashboard>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/students"
+          element={
+            token ? (
+              <Dashboard>
+                <StudentListContainer
+                  token={token}
+                  grade={grade}
+                  section={section}
+                />
               </Dashboard>
             ) : (
               <Navigate to="/" />

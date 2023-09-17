@@ -4,32 +4,41 @@ import AddStudent from "../components/AddStudent";
 import StudentDetails from "./StudentDetails";
 import Swal from "sweetalert2";
 import { AiFillPlusCircle } from "react-icons/ai";
-const StudentList = ({ token }) => {
+
+const StudentList = ({ token, grades, sections }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState(null);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [grade, setGrade] = useState("7"); // Define grade state
-  const [section, setSection] = useState("1"); // Define section state
-
-  const grades = [7, 8, 9, 10, 11, 12];
-  const sections = [1, 2];
+  const [grade, setGrade] = useState(""); // Add grade state
+  const [section, setSection] = useState(""); // Add section state
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/api/student/${grade}/${section}/students`, // Use grade and section in the API request
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // Check if grade and section are set before making the request
+      if (grade !== "" && section !== "") {
+        console.log(
+          "Fetching students for grade",
+          grade,
+          "and section",
+          section
+        );
+        const response = await axios.get(
+          `http://localhost:3000/api/student/${grade}/${section}/students`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      if (response.status === 200) {
-        setStudents(response.data);
-        setLoading(false);
+        console.log("API Response:", response.data);
+
+        if (response.status === 200) {
+          setStudents(response.data);
+          setLoading(false);
+        }
       }
     } catch (error) {
       console.error("Fetch students error:", error);
@@ -39,7 +48,6 @@ const StudentList = ({ token }) => {
   useEffect(() => {
     fetchStudents();
   }, [token, grade, section]);
-
   const toggleAddStudentModal = () => {
     setIsAddStudentModalOpen(!isAddStudentModalOpen);
   };

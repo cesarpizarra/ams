@@ -19,8 +19,8 @@ function verifyToken(req, res, next) {
       // Check if the teacher handles the requested grade and section
       if (
         decoded.role === "teacher" ||
-        decoded.grades.includes(parseInt(req.params.grade)) ||
-        decoded.sections.includes(parseInt(req.params.section))
+        decoded.grade.includes(parseInt(req.params.grade)) ||
+        decoded.section.includes(parseInt(req.params.section))
       ) {
         req.user = decoded;
         next();
