@@ -11,8 +11,8 @@ const StudentList = ({ token, grades, sections }) => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [grade, setGrade] = useState(""); // Add grade state
-  const [section, setSection] = useState(""); // Add section state
+  const [grade, setGrade] = useState(grades);
+  const [section, setSection] = useState(sections);
 
   const fetchStudents = async () => {
     try {

@@ -30,8 +30,9 @@ const LoginForm = ({ onLogin }) => {
       const { token, role, grade, section } = response.data; // Extract grade and section
 
       localStorage.setItem("token", token);
-      localStorage.setItem("grades", JSON.stringify(grade)); // Store grade as a string
-      localStorage.setItem("sections", JSON.stringify(section)); // Store section as a string
+      localStorage.setItem("grades", JSON.stringify(Number(grade))); // Store grade as a number
+      localStorage.setItem("sections", JSON.stringify(Number(section))); // Store section as a number
+
       onLogin(token, role);
 
       // Show a success SweetAlert
