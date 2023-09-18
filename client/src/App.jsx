@@ -9,6 +9,7 @@ import {
 import LoginForm from "./components/LoginForm";
 import StudentListContainer from "./pages/StudentListContainer";
 import Dashboard from "./components/Dashboard";
+import ScanPage from "./pages/ScanPage";
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -77,6 +78,18 @@ const App = () => {
                   grade={grade}
                   section={section}
                 />
+              </Dashboard>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/scan"
+          element={
+            token ? (
+              <Dashboard>
+                <ScanPage />
               </Dashboard>
             ) : (
               <Navigate to="/" />

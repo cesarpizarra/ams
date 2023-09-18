@@ -6,7 +6,7 @@ import BorderIdCard from "../assets/border.png";
 
 const StudentDetails = ({ student, onClose }) => {
   const qrCodeRef = useRef(null);
-  const [scannedFullName, setScannedFullName] = useState(null);
+  const [scannedData, setScannedData] = useState(null);
 
   const downloadIDCard = async () => {
     const schoolName = "LNHS";
@@ -95,9 +95,11 @@ const StudentDetails = ({ student, onClose }) => {
     link.download = pdfFilename;
     link.click();
   };
+
   const handleScan = (data) => {
-    // Assuming that the scanned data is the student's full name
-    setScannedFullName(data);
+    // Assuming that the scanned data is the student's full name and ID separated by a delimiter (e.g., "|")
+    const [scannedFullName, scannedID] = data.split("");
+    setScannedData({ fullName: scannedFullName, id: scannedID });
   };
 
   return (
@@ -123,10 +125,7 @@ const StudentDetails = ({ student, onClose }) => {
           <strong>QR Code:</strong>
           <div ref={qrCodeRef}>
             <QRCode
-              value={
-                scannedFullName ||
-                `${student.firstName} ${student.middleName} ${student.lastName}`
-              }
+              value={`${student.firstName} ${student.middleName} ${student.lastName} ${student._id}`}
               size={128}
             />
           </div>
@@ -138,9 +137,11 @@ const StudentDetails = ({ student, onClose }) => {
           </button>
         </div>
         <div className="mt-4">
-          {scannedFullName && (
+          {scannedData && (
             <div>
-              <strong>Scanned Full Name:</strong> {scannedFullName}
+              <strong>Scanned Full Name:</strong> {scannedData.fullName}
+              <br />
+              <strong>Scanned ID:</strong> {scannedData.id}
             </div>
           )}
         </div>
