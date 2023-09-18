@@ -6,7 +6,6 @@ const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const gradesSectionsRoutes = require("./routes/gradesSectionsRoutes");
-const attendance = require("./models/attendance");
 require("dotenv").config();
 
 const app = express();

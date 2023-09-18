@@ -4,6 +4,9 @@ const attendanceController = require("../controllers/attendanceController");
 
 router.post("/timein", attendanceController.recordTimeIn);
 router.post("/timeout", attendanceController.recordTimeOut);
-router.post("/mark", attendanceController.markAttendance);
+router.get(
+  "/student/:studentId",
+  attendanceController.getAttendanceRecordsForStudent
+);
 
 module.exports = router;

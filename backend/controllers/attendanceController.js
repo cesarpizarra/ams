@@ -44,24 +44,20 @@ exports.recordTimeOut = async (req, res) => {
   }
 };
 
-exports.markAttendance = async (req, res) => {
+exports.getAttendanceRecordsForStudent = async (req, res) => {
   try {
-    const { studentId, scannedData, status } = req.body;
+    const { studentId } = req.params;
 
-    // Find the latest attendance record for the student and update the status field
-    const latestRecord = await Attendance.findOne({ studentId }).sort({
-      date: -1,
-    });
+    // Find all attendance records for the specified student
+    const attendanceRecords = await Attendance.find({ student: studentId });
 
-    if (latestRecord) {
-      latestRecord.status = status;
-      await latestRecord.save();
-      res.status(200).json({ message: "Attendance marked successfully" });
-    } else {
-      res
-        .status(400)
-        .json({ message: "No attendance record found for the student" });
+    if (!attendanceRecords) {
+      return res
+        .status(404)
+        .json({ message: "No attendance records found for this student" });
     }
+
+    res.status(200).json({ attendanceRecords });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

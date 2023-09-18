@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "axios";
 import jsQR from "jsqr";
+import Swal from "sweetalert2";
 
 const ScanPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const ScanPage = () => {
   const [file, setFile] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const handleScan = (data) => {
     if (data) {
@@ -100,14 +102,29 @@ const ScanPage = () => {
         await Axios.post("http://localhost:3000/api/attendance/timein", {
           studentId: scannedData,
         });
-        alert("Time In recorded successfully");
-        navigate("/dashboard");
+        Swal.fire({
+          icon: "success",
+          title: "Time in successful",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        // Reset the scannedData state
+        setScannedData("");
+        // Reset the file input field
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        // Reset the uploaded image state
+        setUploadedImage(null);
       } else {
-        alert("No QR code scanned. Please scan a QR code.");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No QR code scanned. Please scan a QR code.",
+        });
       }
     } catch (error) {
       console.error("Error recording Time In:", error);
-      alert("Error recording Time In");
     }
   };
 
@@ -115,17 +132,32 @@ const ScanPage = () => {
     try {
       if (scannedData) {
         // Send the scanned data (studentId) to the backend
-        await Axios.post("http://localhost:3000/api/attendance/timein", {
+        await Axios.post("http://localhost:3000/api/attendance/timeout", {
           studentId: scannedData,
         });
-        alert("Time Out recorded successfully");
-        navigate("/dashboard");
+        Swal.fire({
+          icon: "success",
+          title: "Time out successful",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        // Reset the scannedData state
+        setScannedData("");
+        // Reset the file input field
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        // Reset the uploaded image state
+        setUploadedImage(null);
       } else {
-        alert("No QR code scanned. Please scan a QR code.");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No QR code scanned. Please scan a QR code.",
+        });
       }
     } catch (error) {
       console.error("Error recording Time Out:", error);
-      alert("Error recording Time Out");
     }
   };
 
@@ -161,8 +193,9 @@ const ScanPage = () => {
         accept="image/*"
         onChange={handleFileUpload}
         className="mt-2"
+        ref={fileInputRef}
       />
-      {scannedData && (
+      {scannedData ? ( // Conditionally render when scannedData is not empty
         <div>
           <p>Scanned Data:</p>
           <p>{scannedData}</p>
@@ -187,7 +220,8 @@ const ScanPage = () => {
             </button>
           </div>
         </div>
-      )}
+      ) : null}{" "}
+      {/* Render nothing when scannedData is empty */}
       {error && <p className="text-red-500">{error}</p>}
     </div>
   );

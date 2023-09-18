@@ -3,6 +3,7 @@ import axios from "axios";
 import Logo from "../assets/logo.png";
 import { BsEyeFill, BsEyeSlashFill } from "react-icons/bs";
 import Swal from "sweetalert2";
+import LoginImage from "../assets/LoginImage.png";
 
 const LoginForm = ({ onLogin }) => {
   const [username, setUsername] = useState("");
@@ -92,14 +93,16 @@ const LoginForm = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className=" w-full flex items-center justify-center gap-20 bg-gray-100 p-8">
+      <div className="hidden md:flex justify-center items-center w-96">
+        <img src={LoginImage} alt="image" className="w-full mt-36" />
+      </div>
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-        <img
-          className="mx-auto h-20 w-auto rounded-full"
-          src={Logo}
-          alt="Logo"
-        />
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-800">
+        <div className="flex items-center gap-5">
+          <img className="h-20 rounded-full" src={Logo} alt="Logo" />
+          <p className="text-xl font-semibold">Leones National High School</p>
+        </div>
+        <h2 className="mt-6 text-center text-2xl font-extrabold text-gray-600">
           Sign in to your account
         </h2>
         <form className="mt-8 space-y-4" onSubmit={(e) => e.preventDefault()}>
@@ -111,7 +114,7 @@ const LoginForm = ({ onLogin }) => {
               autoComplete="username"
               required
               placeholder=" "
-              className="input w-full"
+              className="input w-full input-style"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -128,7 +131,7 @@ const LoginForm = ({ onLogin }) => {
                 autoComplete="current-password"
                 required
                 placeholder=" "
-                className="input w-full"
+                className="input w-full input-style"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -184,7 +187,7 @@ const LoginForm = ({ onLogin }) => {
             <button
               type="button"
               onClick={handleLogin}
-              className="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:bg-indigo-700"
+              className="w-full py-2 px-4 bg-green-400 text-white rounded-lg hover:bg-green-500 focus:outline-none "
             >
               Sign In
             </button>
