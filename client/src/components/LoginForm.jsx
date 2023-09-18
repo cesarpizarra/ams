@@ -9,8 +9,8 @@ const LoginForm = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
-  const [grade, setGrade] = useState(""); // Add grade state
-  const [section, setSection] = useState(""); // Add section state
+  const [grade, setGrade] = useState("");
+  const [section, setSection] = useState("");
 
   const grades = [7, 8, 9, 10, 11, 12];
   const sections = [1, 2];
@@ -18,6 +18,17 @@ const LoginForm = ({ onLogin }) => {
   const handleLogin = async () => {
     try {
       setError(null);
+
+      // Check if grade and section are selected
+      if (!grade || !section) {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: "Please select a grade and section",
+          showConfirmButton: true,
+        });
+        return;
+      }
 
       const response = await axios.post(
         "http://localhost:3000/api/auth/login",
@@ -27,22 +38,46 @@ const LoginForm = ({ onLogin }) => {
         }
       );
 
-      const { token, role, grade, section } = response.data; // Extract grade and section
+      const {
+        token,
+        role,
+        grade: userGrades,
+        section: userSections,
+      } = response.data;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("grades", JSON.stringify(Number(grade))); // Store grade as a number
-      localStorage.setItem("sections", JSON.stringify(Number(section))); // Store section as a number
+      console.log("Received userGrades:", userGrades);
+      console.log("Received userSections:", userSections);
+      console.log("Selected grade:", grade);
+      console.log("Selected section:", section);
 
-      onLogin(token, role);
+      // Check if the selected grade and section are included in the user's grades and sections
+      const isGradeValid = userGrades.includes(Number(grade));
+      const isSectionValid = userSections.includes(Number(section));
 
-      // Show a success SweetAlert
-      Swal.fire({
-        icon: "success",
-        title: "Login Successful",
-        text: "Welcome back!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      if (isGradeValid && isSectionValid) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("grade", JSON.stringify(Number(grade)));
+        localStorage.setItem("section", JSON.stringify(Number(section)));
+
+        onLogin(token, role);
+
+        // Show a success SweetAlert
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: "Welcome back!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        // Display an error message for incorrect grade or section
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "You don't have permission with this grade and section",
+          showConfirmButton: true,
+        });
+      }
     } catch (error) {
       console.error("Login error:", error);
 
