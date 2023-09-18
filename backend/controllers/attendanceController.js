@@ -1,8 +1,8 @@
+const Student = require("../models/student");
 const Attendance = require("../models/attendance");
-
 exports.recordTimeIn = async (req, res) => {
   try {
-    const { studentId, scannedData } = req.body;
+    const { studentId } = req.body;
     const currentTime = new Date();
 
     // Save the time in record to the database
@@ -12,6 +12,16 @@ exports.recordTimeIn = async (req, res) => {
       date: currentTime.toISOString().slice(0, 10),
       status: "Present",
     });
+
+    // Find the student details based on studentId
+    const student = await Student.findOne({ _id: studentId });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // You can now access student details like student.name, student.rollNumber, etc.
+
     await attendanceRecord.save();
 
     res.status(201).json({ message: "Time in recorded successfully" });
@@ -23,7 +33,7 @@ exports.recordTimeIn = async (req, res) => {
 
 exports.recordTimeOut = async (req, res) => {
   try {
-    const { studentId, scannedData } = req.body;
+    const { studentId } = req.body;
     const currentTime = new Date();
 
     // Find the latest attendance record for the student and update the time out field
@@ -33,6 +43,16 @@ exports.recordTimeOut = async (req, res) => {
 
     if (latestRecord && !latestRecord.timeOut) {
       latestRecord.timeOut = currentTime;
+
+      // Find the student details based on studentId
+      const student = await Student.findOne({ _id: studentId });
+
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      // You can now access student details like student.name, student.rollNumber, etc.
+
       await latestRecord.save();
       res.status(200).json({ message: "Time out recorded successfully" });
     } else {
@@ -49,7 +69,7 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
     const { studentId } = req.params;
 
     // Find all attendance records for the specified student
-    const attendanceRecords = await Attendance.find({ student: studentId });
+    const attendanceRecords = await Attendance.find({ studentId });
 
     if (!attendanceRecords) {
       return res
