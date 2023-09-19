@@ -20,7 +20,6 @@ const ScanPage = () => {
       setScanning(false);
     }
   };
-
   const handleError = (err) => {
     console.error(err);
     setError("An error occurred while scanning. Please try again.");

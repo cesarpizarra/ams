@@ -15,7 +15,7 @@ body {
 }
 
 .input-style:focus {
-  box-shadow: 0 0 0 0.2rem rgba(87, 237, 149, 0.796);
+  box-shadow: 0 0 0 0.1rem rgba(83, 178, 252, 0.796);
 }
 
 .input-group {

@@ -68,6 +68,13 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
 
+    // Find the specified student
+    const student = await Student.findOne({ _id: studentId });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
     // Find all attendance records for the specified student
     const attendanceRecords = await Attendance.find({ studentId });
 
@@ -77,7 +84,17 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
         .json({ message: "No attendance records found for this student" });
     }
 
-    res.status(200).json({ attendanceRecords });
+    // Combine student information and attendance records in the response
+    const response = {
+      student: {
+        firstName: student.firstName,
+        middleName: student.middleName,
+        lastName: student.lastName,
+      },
+      attendanceRecords,
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

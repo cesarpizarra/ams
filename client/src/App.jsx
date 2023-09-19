@@ -10,11 +10,13 @@ import LoginForm from "./components/LoginForm";
 import StudentListContainer from "./pages/StudentListContainer";
 import Dashboard from "./components/Dashboard";
 import ScanPage from "./pages/ScanPage";
+import AttendanceRecord from "./pages/AttendanceRecord";
 
 const App = () => {
   const [token, setToken] = useState(null);
   const [grade, setGrades] = useState([]);
   const [section, setSections] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -77,6 +79,23 @@ const App = () => {
                   token={token}
                   grade={grade}
                   section={section}
+                />
+              </Dashboard>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/attendance"
+          element={
+            token ? (
+              <Dashboard>
+                <AttendanceRecord
+                  studentId={selectedStudentId}
+                  token={token}
+                  grades={grade}
+                  sections={section}
                 />
               </Dashboard>
             ) : (
