@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
@@ -11,6 +10,7 @@ import StudentListContainer from "./pages/StudentListContainer";
 import Dashboard from "./components/Dashboard";
 import ScanPage from "./pages/ScanPage";
 import AttendanceRecord from "./pages/AttendanceRecord";
+import StudentRecords from "./components/StudentRecords";
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -91,12 +91,19 @@ const App = () => {
           element={
             token ? (
               <Dashboard>
-                <AttendanceRecord
-                  studentId={selectedStudentId}
-                  token={token}
-                  grades={grade}
-                  sections={section}
-                />
+                <AttendanceRecord />
+              </Dashboard>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/student-records"
+          element={
+            token ? (
+              <Dashboard>
+                <StudentRecords />
               </Dashboard>
             ) : (
               <Navigate to="/" />

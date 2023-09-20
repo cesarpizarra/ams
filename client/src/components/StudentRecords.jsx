@@ -1,36 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 
-const AttendanceRecord = () => {
-  const [studentData, setStudentData] = useState(null);
+const StudentRecords = ({ studentData }) => {
+  const [inputTypes, setInputTypes] = useState({
+    January: "",
+    February: "",
+    March: "",
+    April: "",
+    May: "",
+    June: "",
+    July: "",
+    August: "",
+    September: "",
+    October: "",
+    November: "",
+    December: "",
+  });
 
-  useEffect(() => {
-    const apiUrl =
-      "http://localhost:3000/api/attendance/student/650785e17ea77fbfbdfd454e";
-
-    axios
-      .get(apiUrl)
-      .then((response) => {
-        const studentInfoFromApi = response.data.student;
-        const attendanceRecordsFromApi = response.data.attendanceRecords;
-
-        if (Array.isArray(attendanceRecordsFromApi)) {
-          setStudentData({
-            student: studentInfoFromApi,
-            attendanceRecords: attendanceRecordsFromApi,
-          });
-        } else {
-          console.error(
-            "Attendance records from API is not an array:",
-            attendanceRecordsFromApi
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+  const handleInputChange = (e, month) => {
+    const updatedInputTypes = { ...inputTypes };
+    updatedInputTypes[month] = e.target.value;
+    setInputTypes(updatedInputTypes);
+  };
 
   return (
     <div>
@@ -78,15 +68,25 @@ const AttendanceRecord = () => {
         </table>
       )}
 
-      {studentData && (
-        <Link to="/student-records">
-          <button className="bg-blue-400 text-white px-2 rounded">
-            View Records
-          </button>
-        </Link>
-      )}
+      <h2>Select Input Type for Each Month</h2>
+      <div>
+        {Object.keys(inputTypes).map((month) => (
+          <div key={month}>
+            <label>{month}:</label>
+            <input
+              type="text"
+              value={inputTypes[month]}
+              onChange={(e) => handleInputChange(e, month)}
+            />
+          </div>
+        ))}
+      </div>
+
+      <button className="bg-blue-400 text-white px-2 rounded">
+        Save Input Types
+      </button>
     </div>
   );
 };
 
-export default AttendanceRecord;
+export default StudentRecords;
