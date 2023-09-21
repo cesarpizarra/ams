@@ -20,8 +20,6 @@ exports.recordTimeIn = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // You can now access student details like student.name, student.rollNumber, etc.
-
     await attendanceRecord.save();
 
     res.status(201).json({ message: "Time in recorded successfully" });
@@ -36,7 +34,6 @@ exports.recordTimeOut = async (req, res) => {
     const { studentId } = req.body;
     const currentTime = new Date();
 
-    // Find the latest attendance record for the student and update the time out field
     const latestRecord = await Attendance.findOne({ studentId }).sort({
       date: -1,
     });
@@ -50,8 +47,6 @@ exports.recordTimeOut = async (req, res) => {
       if (!student) {
         return res.status(404).json({ message: "Student not found" });
       }
-
-      // You can now access student details like student.name, student.rollNumber, etc.
 
       await latestRecord.save();
       res.status(200).json({ message: "Time out recorded successfully" });
@@ -68,7 +63,6 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
 
-    // Find the specified student
     const student = await Student.findOne({ _id: studentId });
 
     if (!student) {

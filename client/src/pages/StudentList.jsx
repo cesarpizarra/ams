@@ -3,7 +3,8 @@ import axios from "axios";
 import AddStudent from "../components/AddStudent";
 import StudentDetails from "./StudentDetails";
 import Swal from "sweetalert2";
-import { AiFillPlusCircle } from "react-icons/ai";
+import { AiFillPlusCircle, AiOutlineDownload } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const StudentList = ({ token, grades, sections }) => {
   const [students, setStudents] = useState([]);
@@ -13,6 +14,7 @@ const StudentList = ({ token, grades, sections }) => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [grade, setGrade] = useState(grades);
   const [section, setSection] = useState(sections);
+  const navigate = useNavigate();
 
   const fetchStudents = async () => {
     try {
@@ -48,6 +50,12 @@ const StudentList = ({ token, grades, sections }) => {
   useEffect(() => {
     fetchStudents();
   }, [token, grade, section]);
+
+  const viewAttendanceRecord = (studentId) => {
+    // Redirect to the attendance record page with the studentId using navigate
+    navigate(`/student-record/${studentId}`);
+  };
+
   const toggleAddStudentModal = () => {
     setIsAddStudentModalOpen(!isAddStudentModalOpen);
   };
@@ -74,7 +82,6 @@ const StudentList = ({ token, grades, sections }) => {
       });
 
       if (response.isConfirmed) {
-        // User clicked "Yes, delete it!" in the SweetAlert
         const deleteResponse = await axios.delete(
           `http://localhost:3000/api/student/${grade}/${section}/delete/${studentId}`,
           {
@@ -86,12 +93,11 @@ const StudentList = ({ token, grades, sections }) => {
 
         if (deleteResponse.status === 200) {
           Swal.fire("Deleted!", "Your file has been deleted.", "success");
-          fetchStudents(); // Refresh the student list
+          fetchStudents();
         } else {
           console.error("Delete student error:", deleteResponse.data.message);
         }
       } else if (response.dismiss === Swal.DismissReason.cancel) {
-        // User clicked "No, cancel" in the SweetAlert
         Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
       }
     } catch (error) {
@@ -186,7 +192,8 @@ const StudentList = ({ token, grades, sections }) => {
             <th className="py-2">Grade</th>
             <th className="py-2">Section</th>
             <th className="py-2">Actions</th>
-            <th className="py-2">View</th>
+            <th className="py-2">QR Code</th>
+            <th className="py-2">Attendance</th>
           </tr>
         </thead>
         <tbody>
@@ -214,9 +221,20 @@ const StudentList = ({ token, grades, sections }) => {
               <td className=" py-2">
                 <button
                   onClick={() => viewStudentDetails(student)}
-                  className="bg-green-500 text-white px-2 py-1 rounded"
+                  className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
                 >
-                  View Details
+                  <span>
+                    <AiOutlineDownload />
+                  </span>
+                  Download QR
+                </button>
+              </td>
+              <td className="py-2">
+                <button
+                  onClick={() => viewAttendanceRecord(student._id)}
+                  className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
+                >
+                  <span>View Attendance Record</span>
                 </button>
               </td>
             </tr>

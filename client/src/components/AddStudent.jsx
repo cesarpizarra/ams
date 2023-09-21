@@ -37,7 +37,7 @@ const AddStudent = ({
       !newStudent.grade ||
       !newStudent.section
     ) {
-      // Display a sweetalert error message indicating that all required fields must be filled
+      // Display a sweetalert error message
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -59,7 +59,7 @@ const AddStudent = ({
       console.log("Response status:", response.status);
 
       if (response.status === 201) {
-        // Student added successfully, clear the input fields
+        // Student added successfully
         setNewStudent({
           firstName: "",
           middleName: "",
@@ -87,9 +87,9 @@ const AddStudent = ({
   };
 
   return (
-    <div>
-      <div className="mb-4">
-        <div className="w-1/3 flex gap-4">
+    <div className="w-96">
+      <div className="mb-4 ">
+        <div className="w-full flex flex-col gap-4">
           <input
             type="text"
             name="firstName"
@@ -116,7 +116,7 @@ const AddStudent = ({
           />
         </div>
 
-        <div className="w-1/3 flex mt-8 gap-4">
+        <div className="w-full flex flex-col mt-8 gap-4">
           <select
             name="grade"
             value={newStudent.grade}
@@ -146,7 +146,7 @@ const AddStudent = ({
           </select>
         </div>
 
-        <div className="w-1/3 mt-8">
+        <div className="w-full mt-8">
           <button
             onClick={addStudent}
             className="bg-blue-500 text-white px-4 py-2 rounded"

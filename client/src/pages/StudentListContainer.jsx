@@ -9,7 +9,7 @@ const StudentListContainer = ({ token }) => {
   console.log(sections);
   return (
     <div>
-      <StudentList token={token} grades={grades} sections={sections} />{" "}
+      <StudentList token={token} grades={grades} sections={sections} />
     </div>
   );
 };

@@ -16,7 +16,6 @@ const StudentDetails = ({ student, onClose }) => {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([200, 320]);
 
-    // Load the background image
     const backgroundUrl = await fetch(BorderIdCard);
     const backgroundData = await backgroundUrl.arrayBuffer();
     const backgroundImage = await pdfDoc.embedPng(backgroundData);
@@ -123,7 +122,7 @@ const StudentDetails = ({ student, onClose }) => {
             onClick={downloadIDCard}
             className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
           >
-            Download ID Card as PDF
+            Download QR Code as PDF
           </button>
         </div>
         <button

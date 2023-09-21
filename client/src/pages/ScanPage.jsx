@@ -194,7 +194,7 @@ const ScanPage = () => {
         className="mt-2"
         ref={fileInputRef}
       />
-      {scannedData ? ( // Conditionally render when scannedData is not empty
+      {scannedData ? (
         <div>
           <p>Scanned Data:</p>
           <p>{scannedData}</p>
@@ -220,7 +220,6 @@ const ScanPage = () => {
           </div>
         </div>
       ) : null}{" "}
-      {/* Render nothing when scannedData is empty */}
       {error && <p className="text-red-500">{error}</p>}
     </div>
   );

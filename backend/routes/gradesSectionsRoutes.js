@@ -7,7 +7,6 @@ const availableSections = [1, 2];
 
 // Route to fetch available grades and sections
 router.get("/grades-and-sections", (req, res) => {
-  // You can fetch this data from a database in a real application
   res
     .status(200)
     .json({ grades: availableGrades, sections: availableSections });

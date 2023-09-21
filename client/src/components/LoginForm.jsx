@@ -62,7 +62,6 @@ const LoginForm = ({ onLogin }) => {
 
         onLogin(token, role);
 
-        // Show a success SweetAlert
         Swal.fire({
           icon: "success",
           title: "Login Successful",
@@ -71,7 +70,6 @@ const LoginForm = ({ onLogin }) => {
           timer: 1500,
         });
       } else {
-        // Display an error message for incorrect grade or section
         Swal.fire({
           icon: "error",
           title: "Oops!",
@@ -82,7 +80,6 @@ const LoginForm = ({ onLogin }) => {
     } catch (error) {
       console.error("Login error:", error);
 
-      // Show an error SweetAlert for failed login attempts
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -95,7 +92,7 @@ const LoginForm = ({ onLogin }) => {
   return (
     <div className=" w-full flex items-center justify-center gap-20 bg-gray-100 p-8">
       <div className="hidden md:flex justify-center items-center w-96">
-        <img src={LoginImage} alt="image" className="w-full mt-36" />
+        <img src={LoginImage} alt="image" className="w-full mt-36 floating " />
       </div>
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <div className="flex items-center gap-5">
