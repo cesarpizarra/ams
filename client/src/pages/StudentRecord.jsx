@@ -4,7 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BiArrowBack } from "react-icons/bi";
 import ExcelJS from "exceljs";
-import { AiFillFileExcel } from "react-icons/ai";
+import { AiFillFileExcel, AiFillDelete } from "react-icons/ai";
+import Swal from "sweetalert2";
 
 const StudentRecord = ({ token }) => {
   const { studentId } = useParams();
@@ -12,29 +13,30 @@ const StudentRecord = ({ token }) => {
   const [studentInfo, setStudentInfo] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchAttendanceRecords = async () => {
-      try {
-        // Fetch attendance records for the specified student
-        const response = await axios.get(
-          `http://localhost:3000/api/attendance/student/${studentId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (response.status === 200) {
-          const { student, attendanceRecords } = response.data;
-          setStudentInfo(student);
-          setAttendanceRecords(attendanceRecords);
+  // Define the fetchAttendanceRecords function
+  const fetchAttendanceRecords = async () => {
+    try {
+      // Fetch attendance records for the specified student
+      const response = await axios.get(
+        `http://localhost:3000/api/attendance/student/${studentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error("Fetch attendance records error:", error);
-      }
-    };
+      );
 
+      if (response.status === 200) {
+        const { student, attendanceRecords } = response.data;
+        setStudentInfo(student);
+        setAttendanceRecords(attendanceRecords);
+      }
+    } catch (error) {
+      console.error("Fetch attendance records error:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchAttendanceRecords();
   }, [studentId, token]);
 
@@ -80,6 +82,45 @@ const StudentRecord = ({ token }) => {
     });
   };
 
+  const deleteAllAttendanceRecords = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Send a DELETE request to the backend to delete all attendance records
+        const response = await axios.delete(
+          `http://localhost:3000/api/attendance/delete-all/${studentId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          // Reload the attendance records after successful deletion
+          fetchAttendanceRecords();
+          Swal.fire("Deleted!", "All records have been deleted.", "success");
+        }
+      } catch (error) {
+        console.error("Delete all attendance records error:", error);
+        Swal.fire(
+          "Error",
+          "An error occurred while deleting records.",
+          "error"
+        );
+      }
+    }
+  };
+
   return (
     <div>
       <div className="mb-4">
@@ -95,13 +136,22 @@ const StudentRecord = ({ token }) => {
           Attendance Record for {studentInfo.firstName} {studentInfo.middleName}{" "}
           {studentInfo.lastName}
         </h2>
-        <button
-          onClick={exportToExcel}
-          className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
-        >
-          <AiFillFileExcel />
-          Export to Excel
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={exportToExcel}
+            className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
+          >
+            <AiFillFileExcel />
+            Export to Excel
+          </button>
+          <button
+            onClick={deleteAllAttendanceRecords}
+            className="bg-red-500 text-white px-2 py-1 rounded flex items-center gap-2"
+          >
+            <AiFillDelete />
+            Delete All Records
+          </button>
+        </div>
       </div>
       <table className="table-auto w-full">
         <thead className="bg-gray-500 text-white">

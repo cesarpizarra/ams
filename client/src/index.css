@@ -161,3 +161,32 @@ input:valid ~ label {
   top: calc(50% - 1.25em);
   left: calc(50% - 1.25em);
 }
+
+/* Scan button */
+/* Add this CSS to your stylesheet or component styles */
+.scan-btn {
+  background-color: #4a90e2; /* Button background color */
+  color: #fff; /* Text color */
+  border: none;
+  border-radius: 8px; /* Rounded corners */
+  padding: 15px 30px; /* Padding around the text */
+  font-size: 18px; /* Font size */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s; /* Smooth color and transform transition on hover */
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+}
+
+/* Button hover effect */
+.scan-btn:hover {
+  background-color: #357abd;
+  transform: scale(1.05); /* Increase button size on hover */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Add a larger shadow on hover */
+}
+
+/* Span styling (optional) */
+.scan-btn span {
+  position: relative;
+  z-index: 1;
+}

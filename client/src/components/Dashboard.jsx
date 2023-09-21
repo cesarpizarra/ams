@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import logo from "../assets/logo-image.png";
-import { BiLogOut, BiListOl, BiSolidTime, BiScan } from "react-icons/bi";
+import { BiLogOut, BiListOl, BiScan } from "react-icons/bi";
 const Dashboard = ({ children }) => {
   const handleLogout = () => {
     Swal.fire({
@@ -25,9 +25,9 @@ const Dashboard = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-200 ">
+    <div className="flex h-screen ">
       {/* Left Sidebar */}
-      <nav className="w-64 bg-white border-r overflow-y-auto">
+      <nav className="hidden md:block w-64 bg-white border-r overflow-y-auto fixed h-full">
         <div className="flex items-center gap-4 p-4">
           <img src={logo} alt="logo" className="w-8" />
           <span className="text-2xl font-semibold text-gray-700">
@@ -63,7 +63,16 @@ const Dashboard = ({ children }) => {
       </nav>
 
       {/* Right Content */}
-      <div className="flex-grow p-6">{children}</div>
+      <div className="hidden md:block flex-grow p-6 ml-64">{children}</div>
+
+      <div className="flex md:hidden flex-col gap-10 items-center justify-center w-full">
+        <div>
+          <img src={logo} alt="logo" className="w-56" />
+        </div>
+        <button className="scan-btn">
+          <span> SCAN</span>
+        </button>
+      </div>
     </div>
   );
 };

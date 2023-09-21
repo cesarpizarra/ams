@@ -94,3 +94,25 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.deleteAllAttendanceRecords = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const student = await Student.findOne({ _id: studentId });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Delete all attendance records for the specified student
+    await Attendance.deleteMany({ studentId });
+
+    res
+      .status(200)
+      .json({ message: "All attendance records deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

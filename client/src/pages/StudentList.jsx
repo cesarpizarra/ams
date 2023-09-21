@@ -97,7 +97,7 @@ const StudentList = ({ token, grades, sections }) => {
         );
 
         if (deleteResponse.status === 200) {
-          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          Swal.fire("Deleted!", "Student has been deleted.", "success");
           fetchStudents();
         } else {
           console.error("Delete student error:", deleteResponse.data.message);

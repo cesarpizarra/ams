@@ -8,5 +8,9 @@ router.get(
   "/student/:studentId",
   attendanceController.getAttendanceRecordsForStudent
 );
+router.delete(
+  "/delete-all/:studentId",
+  attendanceController.deleteAllAttendanceRecords
+);
 
 module.exports = router;
