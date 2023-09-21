@@ -3,7 +3,12 @@ import axios from "axios";
 import AddStudent from "../components/AddStudent";
 import StudentDetails from "./StudentDetails";
 import Swal from "sweetalert2";
-import { AiFillPlusCircle, AiOutlineDownload } from "react-icons/ai";
+import {
+  AiFillPlusCircle,
+  AiOutlineDownload,
+  AiOutlineEdit,
+} from "react-icons/ai";
+import { BsFillTrashFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
 const StudentList = ({ token, grades, sections }) => {
@@ -20,12 +25,12 @@ const StudentList = ({ token, grades, sections }) => {
     try {
       // Check if grade and section are set before making the request
       if (grade !== "" && section !== "") {
-        console.log(
-          "Fetching students for grade",
-          grade,
-          "and section",
-          section
-        );
+        // console.log(
+        //   "Fetching students for grade",
+        //   grade,
+        //   "and section",
+        //   section
+        // );
         const response = await axios.get(
           `http://localhost:3000/api/student/${grade}/${section}/students`,
           {
@@ -35,7 +40,7 @@ const StudentList = ({ token, grades, sections }) => {
           }
         );
 
-        console.log("API Response:", response.data);
+        // console.log("API Response:", response.data);
 
         if (response.status === 200) {
           setStudents(response.data);
@@ -208,33 +213,36 @@ const StudentList = ({ token, grades, sections }) => {
                 <button
                   onClick={() => openEditModal(student)}
                   className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+                  title="Edit Student"
                 >
-                  Edit
+                  <AiOutlineEdit />
                 </button>
                 <button
                   onClick={() => deleteStudent(student._id)}
                   className="bg-red-500 text-white px-2 py-1 rounded"
+                  title="Remove Student"
                 >
-                  Delete
+                  <BsFillTrashFill />
                 </button>
               </td>
               <td className=" py-2">
                 <button
+                  title="Download QR Code"
                   onClick={() => viewStudentDetails(student)}
                   className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
                 >
                   <span>
                     <AiOutlineDownload />
                   </span>
-                  Download QR
                 </button>
               </td>
               <td className="py-2">
                 <button
+                  title="View Attendance Record"
                   onClick={() => viewAttendanceRecord(student._id)}
                   className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
                 >
-                  <span>View Attendance Record</span>
+                  <span>View Record</span>
                 </button>
               </td>
             </tr>

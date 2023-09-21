@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BiArrowBack } from "react-icons/bi";
+import ExcelJS from "exceljs";
+import { AiFillFileExcel } from "react-icons/ai";
+
 const StudentRecord = ({ token }) => {
   const { studentId } = useParams();
   const [attendanceRecords, setAttendanceRecords] = useState([]);
@@ -37,6 +41,45 @@ const StudentRecord = ({ token }) => {
   const goBackToStudentList = () => {
     navigate("/students");
   };
+
+  const exportToExcel = () => {
+    // Create a new Excel workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Attendance Records");
+
+    // Add headers to the Excel worksheet
+    worksheet.addRow(["Full Name", "Date", "Time In", "Time Out", "Status"]);
+
+    // Add attendance records to the worksheet
+    attendanceRecords.forEach((record) => {
+      const { date, timeIn, timeOut, status } = record;
+      worksheet.addRow([
+        `${studentInfo.firstName} ${studentInfo.middleName} ${studentInfo.lastName}`,
+        new Date(date).toLocaleDateString(),
+        new Date(timeIn).toLocaleTimeString(),
+        new Date(timeOut).toLocaleTimeString(),
+        status,
+      ]);
+    });
+
+    // Create a blob containing the Excel file
+    workbook.xlsx.writeBuffer().then((data) => {
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link to trigger the download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${studentInfo.firstName} ${studentInfo.middleName} ${studentInfo.lastName}_Attendance.xlsx`; // Set the file name
+      document.body.appendChild(a);
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+    });
+  };
+
   return (
     <div>
       <div className="mb-4">
@@ -44,16 +87,26 @@ const StudentRecord = ({ token }) => {
           onClick={goBackToStudentList}
           className="bg-blue-500 text-white px-2 py-1 rounded"
         >
-          Back to Student List
+          <BiArrowBack />
         </button>
       </div>
-      <h2>
-        Attendance Record for {studentInfo.firstName} {studentInfo.lastName}
-      </h2>
+      <div className="mb-4 flex justify-between">
+        <h2 className="text-xl font-semibold">
+          Attendance Record for {studentInfo.firstName} {studentInfo.middleName}{" "}
+          {studentInfo.lastName}
+        </h2>
+        <button
+          onClick={exportToExcel}
+          className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
+        >
+          <AiFillFileExcel />
+          Export to Excel
+        </button>
+      </div>
       <table className="table-auto w-full">
         <thead className="bg-gray-500 text-white">
-          <tr>
-            <th className="py-2">Date</th>
+          <tr className="text-left">
+            <th className="py-2 px-2">Date</th>
             <th className="py-2">Time In</th>
             <th className="py-2">Time Out</th>
             <th className="py-2">Status</th>
@@ -61,23 +114,35 @@ const StudentRecord = ({ token }) => {
         </thead>
         <tbody>
           {attendanceRecords.length === 0 ? (
-            <tr>
-              <td colSpan="4">
+            <tr className="text-center">
+              <td colSpan="4" className="pt-40 text-red-500">
                 No Attendance Record for {studentInfo.firstName}{" "}
-                {studentInfo.lastName}
+                {studentInfo.middleName} {studentInfo.lastName}
               </td>
             </tr>
           ) : (
             attendanceRecords.map((record) => (
               <tr key={record._id}>
                 <td className="py-2">
-                  {new Date(record.date).toLocaleDateString()}
+                  {new Date(record.date).toLocaleDateString("en-US", {
+                    month: "long",
+                  })}{" "}
+                  {new Date(record.date).getDate()},{" "}
+                  {new Date(record.date).getFullYear()}
                 </td>
                 <td className="py-2">
-                  {new Date(record.timeIn).toLocaleTimeString()}
+                  {new Date(record.timeIn).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                  })}
                 </td>
                 <td className="py-2">
-                  {new Date(record.timeOut).toLocaleTimeString()}
+                  {new Date(record.timeOut).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                  })}
                 </td>
                 <td className="py-2">{record.status}</td>
               </tr>

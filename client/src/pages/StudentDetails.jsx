@@ -4,6 +4,8 @@ import { PDFDocument, rgb } from "pdf-lib";
 import { toPng } from "html-to-image";
 import BorderIdCard from "../assets/border.png";
 
+import { AiOutlineDownload } from "react-icons/ai";
+
 const StudentDetails = ({ student, onClose }) => {
   const qrCodeRef = useRef(null);
 
@@ -118,19 +120,22 @@ const StudentDetails = ({ student, onClose }) => {
           <div ref={qrCodeRef}>
             <QRCode value={student._id} size={128} />
           </div>
-          <button
-            onClick={downloadIDCard}
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-          >
-            Download QR Code as PDF
-          </button>
+          <div className="mt-4">
+            <button
+              title="Download QR Code"
+              onClick={downloadIDCard}
+              className="bg-blue-500 text-white px-4 py-3 rounded mt-2 hover:bg-blue-600"
+            >
+              <AiOutlineDownload />
+            </button>
+            <button
+              onClick={onClose}
+              className="bg-gray-500 text-white px-4 py-2 rounded  ml-2"
+            >
+              Close
+            </button>
+          </div>
         </div>
-        <button
-          onClick={onClose}
-          className="bg-gray-500 text-white px-4 py-2 rounded mt-4"
-        >
-          Close
-        </button>
       </div>
     </div>
   );

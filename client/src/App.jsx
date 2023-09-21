@@ -10,6 +10,7 @@ import StudentListContainer from "./pages/StudentListContainer";
 import Dashboard from "./components/Dashboard";
 import ScanPage from "./pages/ScanPage";
 import StudentRecord from "./pages/StudentRecord";
+import "animate.css";
 
 const App = () => {
   const [token, setToken] = useState(null);
