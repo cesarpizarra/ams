@@ -126,7 +126,7 @@ const Dashboard = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error recording Time In:", error);
+      console.error("Error recording Timse In:", error);
     }
   };
 
@@ -198,14 +198,14 @@ const Dashboard = ({ children }) => {
       <div className="hidden md:block flex-grow p-6 ml-64">{children}</div>
 
       {/* Mobile Scan Button and Camera */}
-      <div className="flex md:hidden flex-col gap-10 items-center justify-center w-full">
+      <div className="flex md:hidden flex-col gap-10 items-center justify-center w-full px-4">
         {showCamera ? (
-          <div>
+          <div className="px-12">
             <video ref={videoRef} autoPlay playsInline />
             <canvas ref={canvasRef} style={{ display: "none" }} />
           </div>
         ) : (
-          <div>
+          <div className="flex flex-col gap-8 ">
             <img src={logo} alt="logo" className="w-56" />
             <button onClick={handleScanButtonClick} className="scan-btn">
               <span> SCAN</span>

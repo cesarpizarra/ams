@@ -151,7 +151,7 @@ const StudentList = ({ token, grades, sections }) => {
   };
 
   return (
-    <div className="w-full max-w-[1240px] mx-auto p-6">
+    <div className="w-full max-w-[1280px] mx-auto p-6">
       {isAddStudentModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded shadow-lg">
