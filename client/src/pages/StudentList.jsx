@@ -103,7 +103,7 @@ const StudentList = ({ token, grades, sections }) => {
           console.error("Delete student error:", deleteResponse.data.message);
         }
       } else if (response.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+        Swal.fire("Cancelled", "Cancelled delete student :)", "error");
       }
     } catch (error) {
       console.error("Delete student error:", error);
