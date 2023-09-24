@@ -1,17 +1,15 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import Axios from "axios";
 import jsQR from "jsqr";
 import Swal from "sweetalert2";
 
 const ScanPage = () => {
-  const navigate = useNavigate();
   const [scannedData, setScannedData] = useState("");
   const [error, setError] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [file, setFile] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
-  const videoRef = useRef(null);
+
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (event) => {
