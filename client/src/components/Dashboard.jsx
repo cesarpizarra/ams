@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import logo from "../assets/logo-image.png";
+import logo from "../assets/logo.png";
 import { BiLogOut, BiListOl, BiScan } from "react-icons/bi";
 const Dashboard = ({ children }) => {
   const handleLogout = () => {

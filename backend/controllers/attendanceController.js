@@ -34,25 +34,26 @@ exports.recordTimeOut = async (req, res) => {
     const { studentId } = req.body;
     const currentTime = new Date();
 
-    const latestRecord = await Attendance.findOne({ studentId }).sort({
-      date: -1,
+    // Find all records for the specified student that don't have a timeOut value
+    const recordsToUpdate = await Attendance.find({
+      studentId,
+      timeOut: { $exists: false },
     });
 
-    if (latestRecord && !latestRecord.timeOut) {
-      latestRecord.timeOut = currentTime;
-
-      // Find the student details based on studentId
-      const student = await Student.findOne({ _id: studentId });
-
-      if (!student) {
-        return res.status(404).json({ message: "Student not found" });
-      }
-
-      await latestRecord.save();
-      res.status(200).json({ message: "Time out recorded successfully" });
-    } else {
-      res.status(400).json({ message: "No time in recorded for the student" });
+    if (recordsToUpdate.length === 0) {
+      return res.status(400).json({
+        message:
+          "No time in recorded for the student or time out already recorded for all records",
+      });
     }
+
+    // Update the timeOut field for each record
+    recordsToUpdate.forEach(async (record) => {
+      record.timeOut = currentTime;
+      await record.save();
+    });
+
+    res.status(201).json({ message: "Time out recorded successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
