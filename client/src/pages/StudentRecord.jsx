@@ -172,7 +172,7 @@ const StudentRecord = ({ token }) => {
             </tr>
           ) : (
             attendanceRecords.map((record) => (
-              <tr key={record._id}>
+              <tr key={record.studentId}>
                 <td className="py-2">
                   {new Date(record.date).toLocaleDateString("en-US", {
                     month: "long",

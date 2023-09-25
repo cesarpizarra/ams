@@ -78,88 +78,72 @@ input:valid ~ label {
 }
 
 /* Loader */
-.loader {
+.spinner {
+  --size: 30px;
+  --first-block-clr: #005bba;
+  --second-block-clr: #fed500;
+  --clr: #111;
+  width: 100px;
+  height: 100px;
   position: relative;
-  width: 2.5em;
-  height: 2.5em;
-  transform: rotate(165deg);
 }
 
-.loader:before,
-.loader:after {
+.spinner::after,
+.spinner::before {
+  box-sizing: border-box;
+  position: absolute;
   content: "";
-  position: absolute;
+  width: var(--size);
+  height: var(--size);
   top: 50%;
+  animation: up 2.4s cubic-bezier(0, 0, 0.24, 1.21) infinite;
   left: 50%;
-  display: block;
-  width: 0.5em;
-  height: 0.5em;
-  border-radius: 0.25em;
-  transform: translate(-50%, -50%);
+  background: var(--first-block-clr);
 }
 
-.loader:before {
-  animation: before8 2s infinite;
+.spinner::after {
+  background: var(--second-block-clr);
+  top: calc(50% - var(--size));
+  left: calc(50% - var(--size));
+  animation: down 2.4s cubic-bezier(0, 0, 0.24, 1.21) infinite;
 }
 
-.loader:after {
-  animation: after6 2s infinite;
-}
-
-@keyframes before8 {
-  0% {
-    width: 0.5em;
-    box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75),
-      -1em 0.5em rgba(111, 202, 220, 0.75);
-  }
-
-  35% {
-    width: 2.5em;
-    box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75),
-      0 0.5em rgba(111, 202, 220, 0.75);
-  }
-
-  70% {
-    width: 0.5em;
-    box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75),
-      1em 0.5em rgba(111, 202, 220, 0.75);
-  }
-
+@keyframes down {
+  0%,
   100% {
-    box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75),
-      -1em 0.5em rgba(111, 202, 220, 0.75);
+    transform: none;
+  }
+
+  25% {
+    transform: translateX(100%);
+  }
+
+  50% {
+    transform: translateX(100%) translateY(100%);
+  }
+
+  75% {
+    transform: translateY(100%);
   }
 }
 
-@keyframes after6 {
-  0% {
-    height: 0.5em;
-    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75),
-      -0.5em -1em rgba(233, 169, 32, 0.75);
-  }
-
-  35% {
-    height: 2.5em;
-    box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75),
-      -0.5em 0 rgba(233, 169, 32, 0.75);
-  }
-
-  70% {
-    height: 0.5em;
-    box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75),
-      -0.5em 1em rgba(233, 169, 32, 0.75);
-  }
-
+@keyframes up {
+  0%,
   100% {
-    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75),
-      -0.5em -1em rgba(233, 169, 32, 0.75);
+    transform: none;
   }
-}
 
-.loader {
-  position: absolute;
-  top: calc(50% - 1.25em);
-  left: calc(50% - 1.25em);
+  25% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(-100%) translateY(-100%);
+  }
+
+  75% {
+    transform: translateY(-100%);
+  }
 }
 
 /* Scan button */

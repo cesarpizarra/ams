@@ -7,8 +7,8 @@ import LoginImage from "../assets/LoginImage.png";
 
 const Loader = () => {
   return (
-    <div>
-      <div className="loader"></div>
+    <div className="flex items-center justify-center h-screen">
+      <div className="spinner"></div>
     </div>
   );
 };

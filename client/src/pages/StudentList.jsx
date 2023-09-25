@@ -65,13 +65,13 @@ const StudentList = ({ token, grades, sections }) => {
     setIsAddStudentModalOpen(!isAddStudentModalOpen);
   };
 
-  const handleEditInputChange = (e, field) => {
-    const { value } = e.target;
-    setEditingStudent((prevStudent) => ({
-      ...prevStudent,
-      [field]: value,
-    }));
-  };
+  // const handleEditInputChange = (e, field) => {
+  //   const { value } = e.target;
+  //   setEditingStudent((prevStudent) => ({
+  //     ...prevStudent,
+  //     [field]: value,
+  //   }));
+  // };
 
   const deleteStudent = async (studentId) => {
     try {
@@ -118,33 +118,33 @@ const StudentList = ({ token, grades, sections }) => {
     setEditingStudent(null);
   };
 
-  const updateStudent = async () => {
-    try {
-      const response = await axios.put(
-        `http://localhost:3000/api/student/${editingStudent.grade}/${editingStudent.section}/update/${editingStudent._id}`,
-        editingStudent,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  // const updateStudent = async () => {
+  //   try {
+  //     const response = await axios.put(
+  //       `http://localhost:3000/api/student/${editingStudent.grade}/${editingStudent.section}/update/${editingStudent._id}`,
+  //       editingStudent,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
 
-      if (response.status === 200) {
-        closeEditModal();
-        fetchStudents();
-        Swal.fire({
-          icon: "success",
-          title: "Updated Successfully",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        return;
-      }
-    } catch (error) {
-      console.error("Update student error:", error);
-    }
-  };
+  //     if (response.status === 200) {
+  //       closeEditModal();
+  //       fetchStudents();
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "Updated Successfully",
+  //         showConfirmButton: false,
+  //         timer: 1500,
+  //       });
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     console.error("Update student error:", error);
+  //   }
+  // };
 
   const viewStudentDetails = (student) => {
     setSelectedStudent(student);
@@ -203,43 +203,43 @@ const StudentList = ({ token, grades, sections }) => {
         </thead>
         <tbody>
           {students.map((student) => (
-            <tr key={student._id}>
+            <tr key={student.studentId}>
               <td className="py-2">{student.firstName}</td>
               <td className="py-2">{student.middleName}</td>
               <td className="py-2">{student.lastName}</td>
               <td className="py-2">{student.grade}</td>
               <td className="py-2">{student.section}</td>
               <td className="py-2">
-                <button
+                {/* <button
                   onClick={() => openEditModal(student)}
                   className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
                   title="Edit Student"
                 >
                   <AiOutlineEdit />
-                </button>
+                </button> */}
                 <button
-                  onClick={() => deleteStudent(student._id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
+                  onClick={() => deleteStudent(student.studentId)}
+                  className="bg-red-500 text-white px-1 gap-2 py-1 rounded flex items-center"
                   title="Remove Student"
                 >
                   <BsFillTrashFill />
+                  Remove
                 </button>
               </td>
               <td className=" py-2">
                 <button
                   title="Download QR Code"
                   onClick={() => viewStudentDetails(student)}
-                  className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
+                  className="bg-blue-500 text-white px-1 py-1 rounded flex items-center gap-2"
                 >
-                  <span>
-                    <AiOutlineDownload />
-                  </span>
+                  <AiOutlineDownload />
+                  QR Code
                 </button>
               </td>
               <td className="py-2">
                 <button
                   title="View Attendance Record"
-                  onClick={() => viewAttendanceRecord(student._id)}
+                  onClick={() => viewAttendanceRecord(student.studentId)}
                   className="bg-green-500 text-white px-2 py-1 rounded flex items-center gap-2"
                 >
                   <span>View Record</span>
@@ -251,7 +251,7 @@ const StudentList = ({ token, grades, sections }) => {
       </table>
 
       {/* Edit Student Modal */}
-      {editingStudent && (
+      {/* {editingStudent && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="flex flex-col bg-white p-4 rounded shadow-lg w-96 gap-2">
             <h2 className="text-2xl font-bold mb-4">Edit Student</h2>
@@ -319,7 +319,7 @@ const StudentList = ({ token, grades, sections }) => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

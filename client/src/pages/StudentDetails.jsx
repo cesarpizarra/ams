@@ -12,8 +12,6 @@ const StudentDetails = ({ student, onClose }) => {
   const downloadIDCard = async () => {
     const schoolName = "LNHS";
     const fullName = `${student.firstName} ${student.middleName} ${student.lastName}`;
-    const grade = `Grade: ${student.grade}`;
-    const section = `Section: ${student.section}`;
 
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([200, 320]);
@@ -49,10 +47,10 @@ const StudentDetails = ({ student, onClose }) => {
     });
 
     // Calculate the center X-coordinate of the QR code
-    const qrCodeCenterX = qrCodeX + qrCodeDims.width / 4.5;
+    const qrCodeCenterX = qrCodeX + qrCodeDims.width / 5.5;
 
     // Calculate the X-coordinate for the school name to center it above the QR code
-    const schoolNameX = qrCodeCenterX - schoolName.length * 3;
+    const schoolNameX = qrCodeCenterX - schoolName.length * 5;
 
     // Calculate the Y-coordinate for the school name above the QR code
     const schoolNameY = qrCodeY + qrCodeDims.height + 15;
@@ -67,21 +65,9 @@ const StudentDetails = ({ student, onClose }) => {
 
     // Add styled text to the PDF
     page.drawText(fullName, {
-      x: 20,
+      x: 40,
       y: 100,
-      size: 14,
-      color: rgb(0, 0, 0),
-    });
-    page.drawText(grade, {
-      x: 20,
-      y: 70,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
-    page.drawText(section, {
-      x: 20,
-      y: 50,
-      size: 12,
+      size: 11,
       color: rgb(0, 0, 0),
     });
 
@@ -98,17 +84,13 @@ const StudentDetails = ({ student, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white p-12 rounded shadow-lg">
+      <div className="bg-white rounded shadow-xl p-8 w-96">
         <h2 className="text-2xl font-bold mb-4">Student Details</h2>
         <div>
-          <strong>First Name:</strong> {student.firstName}
+          <strong>Full Name:</strong>{" "}
+          {`${student.firstName} ${student.middleName} ${student.lastName}`}
         </div>
-        <div>
-          <strong>Middle Name:</strong> {student.middleName}
-        </div>
-        <div>
-          <strong>Last Name:</strong> {student.lastName}
-        </div>
+
         <div>
           <strong>Grade:</strong> {student.grade}
         </div>
@@ -118,19 +100,22 @@ const StudentDetails = ({ student, onClose }) => {
         <div className="mt-4">
           <strong>QR Code:</strong>
           <div ref={qrCodeRef}>
-            <QRCode value={student._id} size={128} />
+            <QRCode
+              value={`ID: ${student.studentId}\nName: ${student.firstName} ${student.middleName} ${student.lastName}`}
+              size={128}
+            />
           </div>
-          <div className="mt-4">
+          <div className="mt-4 flex">
             <button
               title="Download QR Code"
               onClick={downloadIDCard}
-              className="bg-blue-500 text-white px-4 py-3 rounded mt-2 hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600 flex items-center"
             >
-              <AiOutlineDownload />
+              <AiOutlineDownload /> Download
             </button>
             <button
               onClick={onClose}
-              className="bg-gray-500 text-white px-4 py-2 rounded  ml-2"
+              className="bg-gray-500 text-white rounded px-4 py-2 ml-2 mt-2"
             >
               Close
             </button>

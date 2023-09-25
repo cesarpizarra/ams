@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 const ScanPage = () => {
   const [scannedData, setScannedData] = useState("");
   const [error, setError] = useState(null);
-  const [scanning, setScanning] = useState(false);
   const [file, setFile] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
 

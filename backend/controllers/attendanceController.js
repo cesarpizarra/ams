@@ -14,7 +14,7 @@ exports.recordTimeIn = async (req, res) => {
     });
 
     // Find the student details based on studentId
-    const student = await Student.findOne({ _id: studentId });
+    const student = await Student.findOne({ studentId: studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -64,7 +64,7 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
 
-    const student = await Student.findOne({ _id: studentId });
+    const student = await Student.findOne({ studentId: studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -100,7 +100,7 @@ exports.deleteAllAttendanceRecords = async (req, res) => {
   try {
     const { studentId } = req.params;
 
-    const student = await Student.findOne({ _id: studentId });
+    const student = await Student.findOne({ studentId: studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });

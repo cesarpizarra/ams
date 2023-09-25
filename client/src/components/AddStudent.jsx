@@ -56,7 +56,7 @@ const AddStudent = ({
         }
       );
 
-      console.log("Response status:", response.status);
+      // console.log("Response status:", response.status);
 
       if (response.status === 201) {
         // Student added successfully
