@@ -65,8 +65,15 @@ const StudentDetails = ({ student, onClose }) => {
 
     // Add styled text to the PDF
     page.drawText(fullName, {
-      x: 40,
+      x: 55,
       y: 100,
+      size: 11,
+      color: rgb(0, 0, 0),
+    });
+
+    page.drawText(student.studentId, {
+      x: 70,
+      y: 130,
       size: 11,
       color: rgb(0, 0, 0),
     });
@@ -100,10 +107,7 @@ const StudentDetails = ({ student, onClose }) => {
         <div className="mt-4">
           <strong>QR Code:</strong>
           <div ref={qrCodeRef}>
-            <QRCode
-              value={`ID: ${student.studentId}\nName: ${student.firstName} ${student.middleName} ${student.lastName}`}
-              size={128}
-            />
+            <QRCode value={student.studentId} size={128} />
           </div>
           <div className="mt-4 flex">
             <button

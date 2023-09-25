@@ -58,8 +58,8 @@ const StudentRecord = ({ token }) => {
       worksheet.addRow([
         `${studentInfo.firstName} ${studentInfo.middleName} ${studentInfo.lastName}`,
         new Date(date).toLocaleDateString(),
-        new Date(timeIn).toLocaleTimeString(),
-        new Date(timeOut).toLocaleTimeString(),
+        formatTime(timeIn),
+        formatTime(timeOut),
         status,
       ]);
     });
@@ -80,6 +80,16 @@ const StudentRecord = ({ token }) => {
 
       window.URL.revokeObjectURL(url);
     });
+  };
+
+  // Function to format time as "8:35 AM" or "8:35 PM"
+  const formatTime = (time) => {
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+    return new Date(time).toLocaleTimeString("en-US", options);
   };
 
   const deleteAllAttendanceRecords = async () => {
@@ -118,6 +128,16 @@ const StudentRecord = ({ token }) => {
           "error"
         );
       }
+    }
+  };
+  // Function to determine the status based on time in and time out
+  const getStatus = (timeIn, timeOut) => {
+    if (!timeIn && !timeOut) {
+      return "Absent";
+    } else if (timeIn && !timeOut) {
+      return "Half Day";
+    } else {
+      return "Present";
     }
   };
 
@@ -172,7 +192,7 @@ const StudentRecord = ({ token }) => {
             </tr>
           ) : (
             attendanceRecords.map((record) => (
-              <tr key={record.studentId}>
+              <tr key={record._id}>
                 <td className="py-2">
                   {new Date(record.date).toLocaleDateString("en-US", {
                     month: "long",
@@ -188,13 +208,18 @@ const StudentRecord = ({ token }) => {
                   })}
                 </td>
                 <td className="py-2">
-                  {new Date(record.timeOut).toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true,
-                  })}
+                  {record.timeOut
+                    ? new Date(record.timeOut).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      })
+                    : "Waiting for Time Out"}
                 </td>
-                <td className="py-2">{record.status}</td>
+
+                <td className="py-2">
+                  {getStatus(record.timeIn, record.timeOut)}
+                </td>
               </tr>
             ))
           )}
