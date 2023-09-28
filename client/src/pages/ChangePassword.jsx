@@ -2,12 +2,20 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import jwtDecode from "jwt-decode";
 
-const ChangePassword = ({ token, userId }) => {
+const ChangePassword = ({ token, userId, setUserId }) => {
   // Initialize the component state when token or userId changes
   useEffect(() => {
-    console.log("Token:", token); // Debugging statement
-    console.log("UserId:", userId); // Debugging statement
+    // Check if userId is initially null, and if so, try to retrieve it from local storage
+    if (userId === null) {
+      const storedToken = localStorage.getItem("token");
+      const decodedToken = jwtDecode(storedToken);
+      if (decodedToken.userId) {
+        setUserId(decodedToken.userId);
+      }
+    }
+
     setFormData({
       userId: userId,
       currentPassword: "",

@@ -124,7 +124,11 @@ const App = () => {
           element={
             token ? (
               <Dashboard>
-                <ChangePassword token={token} userId={userId} />
+                <ChangePassword
+                  token={token}
+                  userId={userId}
+                  setUserId={setUserId}
+                />
               </Dashboard>
             ) : (
               <Navigate to="/" />
