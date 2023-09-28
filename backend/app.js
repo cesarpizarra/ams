@@ -32,6 +32,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api", gradesSectionsRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/attendance", attendanceRoutes);
+
+//404
+app.use((req, res, next) => {
+  res.status(404).send("Page not Found!");
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`.underline.yellow);
