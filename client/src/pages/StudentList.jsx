@@ -32,7 +32,7 @@ const StudentList = ({ token, grades, sections }) => {
         //   section
         // );
         const response = await axios.get(
-          `http://localhost:3000/api/student/${grade}/${section}/students`,
+          `https://lnhs.vercel.app/api/student/${grade}/${section}/students`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -88,7 +88,7 @@ const StudentList = ({ token, grades, sections }) => {
 
       if (response.isConfirmed) {
         const deleteResponse = await axios.delete(
-          `http://localhost:3000/api/student/${grade}/${section}/delete/${studentId}`,
+          `https://lnhs.vercel.app/api/student/${grade}/${section}/delete/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

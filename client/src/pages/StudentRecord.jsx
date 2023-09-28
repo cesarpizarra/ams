@@ -107,7 +107,7 @@ const StudentRecord = ({ token }) => {
       try {
         // Send a DELETE request to the backend to delete all attendance records
         const response = await axios.delete(
-          `http://localhost:3000/api/attendance/delete-all/${studentId}`,
+          `https://lnhs.vercel.app/api/attendance/delete-all/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

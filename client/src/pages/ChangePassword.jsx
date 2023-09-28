@@ -49,7 +49,7 @@ const ChangePassword = ({ token, userId }) => {
       try {
         // Send a POST request to update the password
         const response = await axios.post(
-          "http://localhost:3000/api/auth/update-password",
+          "https://lnhs.vercel.app/api/auth/update-password",
           formData,
           {
             headers: {
