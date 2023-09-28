@@ -32,7 +32,7 @@ const StudentList = ({ token, grades, sections }) => {
         //   section
         // );
         const response = await axios.get(
-          `https://lnhs.vercel.app/api/student/${grade}/${section}/students`,
+          `https://lnhs-api.vercel.app/api/student/${grade}/${section}/students`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
