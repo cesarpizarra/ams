@@ -33,7 +33,7 @@ app.use("/api", gradesSectionsRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/attendance", attendanceRoutes);
 
-//404
+//message 404
 app.use((req, res, next) => {
   res.status(404).send("Page not Found!");
 });
