@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const ChangePassword = ({ token, userId }) => {
+  // Initialize the component state when token or userId changes
+  useEffect(() => {
+    setFormData({
+      userId: userId,
+      currentPassword: "",
+      newPassword: "",
+    });
+  }, [token, userId]);
+
   const [formData, setFormData] = useState({
     userId: userId,
     currentPassword: "",
