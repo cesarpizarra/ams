@@ -6,6 +6,8 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 const ChangePassword = ({ token, userId }) => {
   // Initialize the component state when token or userId changes
   useEffect(() => {
+    console.log("Token:", token); // Debugging statement
+    console.log("UserId:", userId); // Debugging statement
     setFormData({
       userId: userId,
       currentPassword: "",
