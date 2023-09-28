@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(cors());
 app.use(
   cors({
-    origin: "https://lnhs-api.vercel.app",
+    origin: "https://lnhs.vercel.app",
   })
 );
 
