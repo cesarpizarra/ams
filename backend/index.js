@@ -26,6 +26,11 @@ mongoose.connection.once("open", () => {
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(
+  cors({
+    origin: "https://lnhs-api.vercel.app",
+  })
+);
 
 // Routes
 app.use("/api/auth", authRoutes);
