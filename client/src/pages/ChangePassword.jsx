@@ -59,11 +59,25 @@ const ChangePassword = ({ token, userId }) => {
         );
 
         if (response.status === 200) {
-          setMessage("Password updated successfully");
+          // setMessage("Password updated successfully");
+
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Passwords updated successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         }
       } catch (error) {
         if (error.response) {
-          setMessage("Password update failed");
+          // setMessage("Password update failed");
+          Swal.fire({
+            icon: "error",
+            title: "Oops!",
+            text: "Password update failed",
+            showConfirmButton: true,
+          });
         }
       }
     }
