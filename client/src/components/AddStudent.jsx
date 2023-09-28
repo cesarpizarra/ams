@@ -47,7 +47,7 @@ const AddStudent = ({
     }
     try {
       const response = await axios.post(
-        `https://lnhs.vercel.app/api/student/${grade}/${section}/add`,
+        `https://lnhs-api.vercel.app/api/student/${grade}/${section}/add`,
         newStudent,
         {
           headers: {

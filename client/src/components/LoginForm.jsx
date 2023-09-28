@@ -47,7 +47,7 @@ const LoginForm = ({ onLogin }) => {
       }
 
       const response = await axios.post(
-        "https://lnhs.vercel.app/api/auth/login",
+        "https://lnhs-api.vercel.app/api/auth/login",
         {
           username,
           password,

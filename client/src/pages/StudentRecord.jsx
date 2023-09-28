@@ -18,7 +18,7 @@ const StudentRecord = ({ token }) => {
     try {
       // Fetch attendance records for the specified student
       const response = await axios.get(
-        `http://localhost:3000/api/attendance/student/${studentId}`,
+        `https://lnhs-api.vercel.app/api/attendance/student/${studentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -107,7 +107,7 @@ const StudentRecord = ({ token }) => {
       try {
         // Send a DELETE request to the backend to delete all attendance records
         const response = await axios.delete(
-          `https://lnhs.vercel.app/api/attendance/delete-all/${studentId}`,
+          `https://lnhs-api.vercel.app/api/attendance/delete-all/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

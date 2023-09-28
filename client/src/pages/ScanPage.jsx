@@ -50,7 +50,7 @@ const ScanPage = () => {
     try {
       if (scannedData) {
         // Send the scanned data (studentId) to the backend
-        await Axios.post("https://lnhs.vercel.app/api/attendance/timein", {
+        await Axios.post("https://lnhs-api.vercel.app/api/attendance/timein", {
           studentId: scannedData,
         });
         Swal.fire({
@@ -83,7 +83,7 @@ const ScanPage = () => {
     try {
       if (scannedData) {
         // Send the scanned data (studentId) to the backend
-        await Axios.post("https://lnhs.vercel.app/api/attendance/timeout", {
+        await Axios.post("https://lnhs-api.vercel.app/api/attendance/timeout", {
           studentId: scannedData,
         });
         Swal.fire({

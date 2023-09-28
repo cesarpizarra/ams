@@ -88,7 +88,7 @@ const StudentList = ({ token, grades, sections }) => {
 
       if (response.isConfirmed) {
         const deleteResponse = await axios.delete(
-          `https://lnhs.vercel.app/api/student/${grade}/${section}/delete/${studentId}`,
+          `https://lnhs-api.vercel.app/api/student/${grade}/${section}/delete/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
