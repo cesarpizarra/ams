@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import logo from "../assets/logo.png";
 import { BiLogOut, BiListOl, BiScan } from "react-icons/bi";
+import { AiFillLock } from "react-icons/ai";
 const Dashboard = ({ children }) => {
   const handleLogout = () => {
     Swal.fire({
@@ -49,6 +50,14 @@ const Dashboard = ({ children }) => {
                 <BiScan />
               </span>
               Scan
+            </Link>
+          </li>
+          <li className="px-4 py-2 border-b-2 border-gray-300">
+            <Link to="/update-password" className="flex items-center gap-2">
+              <span>
+                <AiFillLock />
+              </span>
+              Change Password
             </Link>
           </li>
           <li className="px-4 py-2 border-b-2 border-gray-300 ">

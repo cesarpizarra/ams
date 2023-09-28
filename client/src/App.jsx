@@ -11,11 +11,14 @@ import Dashboard from "./components/Dashboard";
 import ScanPage from "./pages/ScanPage";
 import StudentRecord from "./pages/StudentRecord";
 import "animate.css";
+import ChangePassword from "./pages/ChangePassword";
+import jwtDecode from "jwt-decode";
 
 const App = () => {
   const [token, setToken] = useState(null);
   const [grade, setGrades] = useState([]);
   const [section, setSections] = useState([]);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -24,6 +27,11 @@ const App = () => {
 
     if (storedToken) {
       setToken(storedToken);
+      // Extract and set the userId from the token when available
+      const decodedToken = jwtDecode(storedToken);
+      if (decodedToken.userId) {
+        setUserId(decodedToken.userId);
+      }
     }
 
     if (storedGrades) {
@@ -105,6 +113,18 @@ const App = () => {
             token ? (
               <Dashboard>
                 <ScanPage />
+              </Dashboard>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/update-password"
+          element={
+            token ? (
+              <Dashboard>
+                <ChangePassword token={token} userId={userId} />
               </Dashboard>
             ) : (
               <Navigate to="/" />

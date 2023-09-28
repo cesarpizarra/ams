@@ -2,7 +2,7 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// User register controller
+// User registration controller
 exports.register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ username: req.body.username });
@@ -69,11 +69,46 @@ exports.login = async (req, res) => {
     res.status(200).json({
       message: "Logged in Successfully",
       token,
+      userId: user._id,
       grade: user.grade,
       section: user.section,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Authentication failed" });
+  }
+};
+
+// Controller method to update the password
+exports.updatePassword = async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the current password is correct
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password in the database
+    await User.findByIdAndUpdate(userId, {
+      password: hashedNewPassword,
+    });
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Password update failed" });
   }
 };
