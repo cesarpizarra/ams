@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/icon.png";
 import { BsEyeFill, BsEyeSlashFill } from "react-icons/bs";
 import Swal from "sweetalert2";
 import LoginImage from "../assets/LoginImage.png";

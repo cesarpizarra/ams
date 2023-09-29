@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import logo from "../assets/logo.png";
+import logo from "../assets/icon.png";
 import { BiLogOut, BiListOl, BiScan } from "react-icons/bi";
 import { AiFillLock } from "react-icons/ai";
 const Dashboard = ({ children }) => {
