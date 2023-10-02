@@ -1,14 +1,12 @@
-import React, { useRef } from "react";
-import QRCode from "react-qr-code";
+import React from "react";
 import { PDFDocument, rgb } from "pdf-lib";
 import { toPng } from "html-to-image";
 import BorderIdCard from "../assets/border.png";
+import QRCode from "qrcode.react";
 
 import { AiOutlineDownload } from "react-icons/ai";
 
 const StudentDetails = ({ student, onClose }) => {
-  const qrCodeRef = useRef(null);
-
   const downloadIDCard = async () => {
     const schoolName = "LNHS";
     const fullName = `${student.firstName} ${student.middleName} ${student.lastName}`;
@@ -31,29 +29,33 @@ const StudentDetails = ({ student, onClose }) => {
       height: imageSize.height,
     });
 
-    // Convert the QR code SVG to a data URL using html-to-image
-    const qrCodeDataUrl = await toPng(qrCodeRef.current);
+    // Convert the QR code to a data URL using qrcode.react
+    const qrCodeDataUrl = await toPng(
+      <QRCode value={student.studentId} size={128} />,
+      { width: 128, height: 128 }
+    );
 
     // Embed the QR code image in the PDF
     const qrCodeImage = await pdfDoc.embedPng(qrCodeDataUrl);
-    const qrCodeDims = qrCodeImage.scale(0.75);
     const qrCodeX = 50;
     const qrCodeY = 150;
+
+    // Draw the QR code with fixed dimensions
     page.drawImage(qrCodeImage, {
       x: qrCodeX,
       y: qrCodeY,
-      width: qrCodeDims.width,
-      height: qrCodeDims.height,
+      width: 128, // Fixed width
+      height: 128, // Fixed height
     });
 
     // Calculate the center X-coordinate of the QR code
-    const qrCodeCenterX = qrCodeX + qrCodeDims.width / 5.5;
+    const qrCodeCenterX = qrCodeX + 128 / 2;
 
     // Calculate the X-coordinate for the school name to center it above the QR code
     const schoolNameX = qrCodeCenterX - schoolName.length * 5;
 
     // Calculate the Y-coordinate for the school name above the QR code
-    const schoolNameY = qrCodeY + qrCodeDims.height + 15;
+    const schoolNameY = qrCodeY + 128 + 15;
 
     // Add the school name to the PDF above the QR code
     page.drawText(schoolName, {
@@ -106,7 +108,8 @@ const StudentDetails = ({ student, onClose }) => {
         </div>
         <div className="mt-4">
           <strong>QR Code:</strong>
-          <div ref={qrCodeRef}>
+          <div>
+            {/* Generate the QR code with fixed dimensions */}
             <QRCode value={student.studentId} size={128} />
           </div>
           <div className="mt-4 flex">

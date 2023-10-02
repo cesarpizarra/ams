@@ -109,7 +109,7 @@ const LoginForm = ({ onLogin }) => {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className=" w-full flex items-center justify-center gap-20 bg-gray-100 p-8">
+        <div className=" w-full flex items-center justify-center gap-20  p-8">
           <div className="hidden md:flex justify-center items-center w-96 animate__animated animate__zoomIn">
             <img
               src={LoginImage}
