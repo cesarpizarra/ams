@@ -36,7 +36,11 @@ const StudentDetails = ({ student, onClose }) => {
 
     // Embed the QR code image in the PDF
     const qrCodeImage = await pdfDoc.embedPng(qrCodeDataUrl);
-    const qrCodeDims = qrCodeImage.scale(0.75);
+
+    // Ensure the QR code image has a fixed aspect ratio (width and height are the same)
+    const qrCodeDims = qrCodeImage.scale(0.75, 0.75);
+
+    // Position the QR code on the page
     const qrCodeX = 50;
     const qrCodeY = 150;
     page.drawImage(qrCodeImage, {
@@ -50,7 +54,7 @@ const StudentDetails = ({ student, onClose }) => {
     const qrCodeCenterX = qrCodeX + qrCodeDims.width / 5.5;
 
     // Calculate the X-coordinate for the school name to center it above the QR code
-    const schoolNameX = qrCodeCenterX - schoolName.length * 5;
+    const schoolNameX = qrCodeCenterX - schoolName.length + 5;
 
     // Calculate the Y-coordinate for the school name above the QR code
     const schoolNameY = qrCodeY + qrCodeDims.height + 15;
@@ -78,6 +82,7 @@ const StudentDetails = ({ student, onClose }) => {
       color: rgb(0, 0, 0),
     });
 
+    // Save the PDF and trigger the download
     const pdfBytes = await pdfDoc.save();
     const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
     const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -106,7 +111,10 @@ const StudentDetails = ({ student, onClose }) => {
         </div>
         <div className="mt-4">
           <strong>QR Code:</strong>
-          <div ref={qrCodeRef}>
+          <div
+            ref={qrCodeRef}
+            style={{ width: "128px", height: "128px" }} // Set the desired width and height
+          >
             <QRCode value={student.studentId} size={128} />
           </div>
           <div className="mt-4 flex">
