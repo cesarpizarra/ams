@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema({
-  studentId: { type: String, unique: true },
+  studentId: {type: String, unique: true},
   firstName: String,
   middleName: String,
   lastName: String,

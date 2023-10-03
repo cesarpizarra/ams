@@ -139,9 +139,10 @@ const StudentRecord = ({ token }) => {
       </div>
       <div className="mb-4 flex justify-between">
         <h2 className="text-xl font-semibold">
-          Attendance Record for {studentInfo.firstName} {studentInfo.middleName}{" "}
-          {studentInfo.lastName}
+          Attendance Record for {studentInfo?.firstName}{" "}
+          {studentInfo?.middleName} {studentInfo?.lastName}
         </h2>
+
         <div className="flex gap-2">
           <button
             onClick={exportToExcel}
