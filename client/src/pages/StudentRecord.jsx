@@ -134,7 +134,7 @@ const StudentRecord = ({ token }) => {
   const getStatus = (timeIn, timeOut) => {
     if (!timeIn) {
       return "Absent";
-    } else if (!timeOut) {
+    } else if (timeIn && !timeOut) {
       return "Half Day";
     } else {
       return "Present";
