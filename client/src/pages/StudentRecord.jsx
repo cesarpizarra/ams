@@ -17,11 +17,14 @@ const StudentRecord = ({ token }) => {
   const fetchAttendanceRecords = async () => {
     try {
       // Fetch attendance records for the specified student
-      const response = await axios.get(`/api/attendance/student/${studentId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `https://lnhs-api.vercel.app/api/attendance/student/${studentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         const { student, attendanceRecords } = response.data;
@@ -79,6 +82,7 @@ const StudentRecord = ({ token }) => {
     });
   };
 
+  // Function to format time as "8:35 AM" or "8:35 PM"
   const formatTime = (time) => {
     const options = {
       hour: "numeric",
@@ -103,7 +107,7 @@ const StudentRecord = ({ token }) => {
       try {
         // Send a DELETE request to the backend to delete all attendance records
         const response = await axios.delete(
-          `/api/attendance/delete-all/${studentId}`,
+          `https://lnhs-api.vercel.app/api/attendance/delete-all/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -126,6 +130,16 @@ const StudentRecord = ({ token }) => {
       }
     }
   };
+  // Function to determine the status based on time in and time out
+  const getStatus = (timeIn, timeOut) => {
+    if (!timeIn && !timeOut) {
+      return "Absent";
+    } else if (timeIn && !timeOut) {
+      return "Half Day";
+    } else {
+      return "Present";
+    }
+  };
 
   return (
     <div>
@@ -139,10 +153,9 @@ const StudentRecord = ({ token }) => {
       </div>
       <div className="mb-4 flex justify-between">
         <h2 className="text-xl font-semibold">
-          Attendance Record for {studentInfo?.firstName}{" "}
-          {studentInfo?.middleName} {studentInfo?.lastName}
+          Attendance Record for {studentInfo.firstName} {studentInfo.middleName}{" "}
+          {studentInfo.lastName}
         </h2>
-
         <div className="flex gap-2">
           <button
             onClick={exportToExcel}
@@ -203,7 +216,10 @@ const StudentRecord = ({ token }) => {
                       })
                     : "Waiting for Time Out"}
                 </td>
-                <td className="py-2">{record.status}</td>
+
+                <td className="py-2">
+                  {getStatus(record.timeIn, record.timeOut)}
+                </td>
               </tr>
             ))
           )}

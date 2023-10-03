@@ -1,31 +1,15 @@
 const Student = require("../models/student");
 const Attendance = require("../models/attendance");
-
 exports.recordTimeIn = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
-    const currentDate = currentTime.toISOString().slice(0, 10);
 
-    // Check if there is already a time-in entry for the current day
-    const existingTimeInRecord = await Attendance.findOne({
-      studentId,
-      date: currentDate,
-      timeIn: { $exists: true },
-      timeOut: { $exists: false },
-    });
-
-    if (existingTimeInRecord) {
-      return res.status(400).json({
-        message: "Time in already recorded for today",
-      });
-    }
-
-    // Save the time-in record to the database
+    // Save the time in record to the database
     const attendanceRecord = new Attendance({
       studentId,
       timeIn: currentTime,
-      date: currentDate,
+      date: currentTime.toISOString().slice(0, 10),
       status: "Present",
     });
 
@@ -49,35 +33,25 @@ exports.recordTimeOut = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
-    const currentDate = currentTime.toISOString().slice(0, 10);
 
-    // Find an open time-in record for the current day
-    const openTimeInRecord = await Attendance.findOne({
+    // Find all records for the specified student that don't have a timeOut value
+    const recordsToUpdate = await Attendance.find({
       studentId,
-      date: currentDate,
-      timeIn: { $exists: true },
       timeOut: { $exists: false },
     });
 
-    if (!openTimeInRecord) {
+    if (recordsToUpdate.length === 0) {
       return res.status(400).json({
-        message: "No open time in record found for today",
+        message:
+          "No time in recorded for the student or time out already recorded for all records",
       });
     }
 
-    // Update the open time-in record with the time-out timestamp
-    openTimeInRecord.timeOut = currentTime;
-
-    // Calculate the status based on timeIn and timeOut
-    if (openTimeInRecord.timeIn && openTimeInRecord.timeOut) {
-      openTimeInRecord.status = "Present";
-    } else if (openTimeInRecord.timeIn && !openTimeInRecord.timeOut) {
-      openTimeInRecord.status = "Half Day";
-    } else {
-      openTimeInRecord.status = "Absent";
-    }
-
-    await openTimeInRecord.save();
+    // Update the timeOut field for each record
+    recordsToUpdate.forEach(async (record) => {
+      record.timeOut = currentTime;
+      await record.save();
+    });
 
     res.status(201).json({ message: "Time out recorded successfully" });
   } catch (error) {
