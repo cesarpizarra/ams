@@ -17,14 +17,11 @@ const StudentRecord = ({ token }) => {
   const fetchAttendanceRecords = async () => {
     try {
       // Fetch attendance records for the specified student
-      const response = await axios.get(
-        `https://lnhs-api.vercel.app/api/attendance/student/${studentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`/api/attendance/student/${studentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status === 200) {
         const { student, attendanceRecords } = response.data;
@@ -82,7 +79,6 @@ const StudentRecord = ({ token }) => {
     });
   };
 
-  // Function to format time as "8:35 AM" or "8:35 PM"
   const formatTime = (time) => {
     const options = {
       hour: "numeric",
@@ -107,7 +103,7 @@ const StudentRecord = ({ token }) => {
       try {
         // Send a DELETE request to the backend to delete all attendance records
         const response = await axios.delete(
-          `https://lnhs-api.vercel.app/api/attendance/delete-all/${studentId}`,
+          `/api/attendance/delete-all/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -128,16 +124,6 @@ const StudentRecord = ({ token }) => {
           "error"
         );
       }
-    }
-  };
-  // Function to determine the status based on time in and time out
-  const getStatus = (timeIn, timeOut) => {
-    if (!timeIn) {
-      return "Absent";
-    } else if (timeIn && !timeOut) {
-      return "Half Day";
-    } else {
-      return "Present";
     }
   };
 
@@ -216,10 +202,7 @@ const StudentRecord = ({ token }) => {
                       })
                     : "Waiting for Time Out"}
                 </td>
-
-                <td className="py-2">
-                  {getStatus(record.timeIn, record.timeOut)}
-                </td>
+                <td className="py-2">{record.status}</td>
               </tr>
             ))
           )}
