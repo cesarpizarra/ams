@@ -132,9 +132,9 @@ const StudentRecord = ({ token }) => {
   };
   // Function to determine the status based on time in and time out
   const getStatus = (timeIn, timeOut) => {
-    if (!timeIn && !timeOut) {
+    if (!timeIn) {
       return "Absent";
-    } else if (timeIn && !timeOut) {
+    } else if (!timeOut) {
       return "Half Day";
     } else {
       return "Present";
