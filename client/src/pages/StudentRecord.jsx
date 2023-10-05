@@ -131,11 +131,13 @@ const StudentRecord = ({ token }) => {
     }
   };
   // Function to determine the status based on time in and time out
-  const getStatus = (timeIn, timeOut) => {
+  const getStatus = (timeIn, timeOut, index) => {
     if (!timeIn && !timeOut) {
-      return "Absent";
-    } else if (timeIn && !timeOut) {
-      return "Half Day";
+      if (index === 0 || (index > 0 && !attendanceRecords[index - 1].timeOut)) {
+        return "Half Day";
+      } else {
+        return "Absent";
+      }
     } else {
       return "Present";
     }
@@ -208,13 +210,13 @@ const StudentRecord = ({ token }) => {
                   })}
                 </td>
                 <td className="py-2">
-                  {record.timeOut
-                    ? new Date(record.timeOut).toLocaleTimeString("en-US", {
+                  {record.timeIn && !record.timeOut
+                    ? "Waiting for Time Out"
+                    : new Date(record.timeOut).toLocaleTimeString("en-US", {
                         hour: "numeric",
                         minute: "numeric",
                         hour12: true,
-                      })
-                    : "Waiting for Time Out"}
+                      })}
                 </td>
 
                 <td className="py-2">
