@@ -16,7 +16,6 @@ const StudentRecord = ({ token }) => {
   // Define the fetchAttendanceRecords function
   const fetchAttendanceRecords = async () => {
     try {
-      // Fetch attendance records for the specified student
       const response = await axios.get(
         `https://lnhs-api.vercel.app/api/attendance/student/${studentId}`,
         {
@@ -218,10 +217,7 @@ const StudentRecord = ({ token }) => {
                         hour12: true,
                       })}
                 </td>
-
-                <td className="py-2">
-                  {getStatus(record.timeIn, record.timeOut)}
-                </td>
+                <td className="py-2">{record.status}</td>
               </tr>
             ))
           )}

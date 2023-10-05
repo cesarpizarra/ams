@@ -60,6 +60,16 @@ exports.recordTimeOut = async (req, res) => {
   }
 };
 
+const calculateStatus = (timeIn, timeOut) => {
+  if (timeIn && timeOut) {
+    return "Present";
+  } else if (timeIn && !timeOut) {
+    return "Half Day";
+  } else {
+    return "Absent";
+  }
+};
+
 exports.getAttendanceRecordsForStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
@@ -79,6 +89,12 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
         .json({ message: "No attendance records found for this student" });
     }
 
+    // Calculate status for each attendance record
+    const formattedRecords = attendanceRecords.map((record) => ({
+      ...record.toObject(),
+      status: calculateStatus(record.timeIn, record.timeOut),
+    }));
+
     // Combine student information and attendance records in the response
     const response = {
       student: {
@@ -86,7 +102,7 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
         middleName: student.middleName,
         lastName: student.lastName,
       },
-      attendanceRecords,
+      attendanceRecords: formattedRecords,
     };
 
     res.status(200).json(response);
