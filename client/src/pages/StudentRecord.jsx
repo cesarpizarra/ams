@@ -58,7 +58,7 @@ const StudentRecord = ({ token }) => {
         `${studentInfo.firstName} ${studentInfo.middleName} ${studentInfo.lastName}`,
         new Date(date).toLocaleDateString(),
         formatTime(timeIn),
-        formatTime(timeOut),
+        timeOut ? formatTime(timeOut) : "No Time Out",
         status,
       ]);
     });
@@ -81,7 +81,7 @@ const StudentRecord = ({ token }) => {
     });
   };
 
-  // Function to format time as "8:35 AM" or "8:35 PM"
+  // Function to format time
   const formatTime = (time) => {
     const options = {
       hour: "numeric",
@@ -175,7 +175,7 @@ const StudentRecord = ({ token }) => {
           {attendanceRecords.length === 0 ? (
             <tr className="text-center">
               <td colSpan="4" className="pt-40 text-red-500">
-                No Attendance Record for {studentInfo.firstName}{" "}
+                No Attendance Record of {studentInfo.firstName}{" "}
                 {studentInfo.middleName} {studentInfo.lastName}
               </td>
             </tr>
@@ -197,14 +197,15 @@ const StudentRecord = ({ token }) => {
                   })}
                 </td>
                 <td className="py-2">
-                  {record.timeIn && !record.timeOut
-                    ? "Waiting for Time Out"
+                  {!record.timeOut
+                    ? "No Time Out"
                     : new Date(record.timeOut).toLocaleTimeString("en-US", {
                         hour: "numeric",
                         minute: "numeric",
                         hour12: true,
                       })}
                 </td>
+
                 <td className="py-2">{record.status}</td>
               </tr>
             ))
