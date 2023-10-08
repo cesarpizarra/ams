@@ -63,7 +63,7 @@ exports.login = async (req, res) => {
         section: user.section,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "1d" }
     );
 
     res.status(200).json({

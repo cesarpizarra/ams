@@ -1,17 +1,11 @@
 const Student = require("../models/student");
 const Attendance = require("../models/attendance");
+
 exports.recordTimeIn = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
-
-    // Save the time in record to the database
-    const attendanceRecord = new Attendance({
-      studentId,
-      timeIn: currentTime,
-      date: currentTime.toISOString().slice(0, 10),
-      status: "Present",
-    });
+    const currentDate = currentTime.toISOString().slice(0, 10);
 
     // Find the student details based on studentId
     const student = await Student.findOne({ studentId: studentId });
@@ -19,6 +13,27 @@ exports.recordTimeIn = async (req, res) => {
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
+
+    // Find the latest attendance record for the student for the current day
+    const latestRecord = await Attendance.findOne({
+      studentId,
+      date: currentDate,
+    }).sort({ timeIn: -1 });
+
+    // Check if a record already exists for today
+    if (latestRecord && latestRecord.timeOut) {
+      return res.status(400).json({
+        message: "Time in already recorded for today, please record time out.",
+      });
+    }
+
+    // Save the time in record for the current day
+    const attendanceRecord = new Attendance({
+      studentId,
+      timeIn: currentTime,
+      date: currentDate,
+      status: "Present", // Set status to "Present" initially
+    });
 
     await attendanceRecord.save();
 
@@ -33,40 +48,39 @@ exports.recordTimeOut = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
+    const currentDate = currentTime.toISOString().slice(0, 10);
 
-    // Find all records for the specified student that don't have a timeOut value
-    const recordsToUpdate = await Attendance.find({
+    // Find the student details based on studentId
+    const student = await Student.findOne({ studentId: studentId });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Find the latest attendance record for the student for the current day
+    const latestRecord = await Attendance.findOne({
       studentId,
-      timeOut: { $exists: false },
-    });
+      date: currentDate,
+    }).sort({ timeIn: -1 });
 
-    if (recordsToUpdate.length === 0) {
+    // Check if a record already exists for today
+    if (!latestRecord || latestRecord.timeOut) {
       return res.status(400).json({
         message:
-          "No time in recorded for the student or time out already recorded for all records",
+          "No time in recorded for today or time out already recorded for today",
       });
     }
 
-    // Update the timeOut field for each record
-    recordsToUpdate.forEach(async (record) => {
-      record.timeOut = currentTime;
-      await record.save();
-    });
+    // Update the latest attendance record with the time out
+    latestRecord.timeOut = currentTime;
+    latestRecord.status = "Present"; // Update status to "Present" for this record
+
+    await latestRecord.save();
 
     res.status(201).json({ message: "Time out recorded successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-const calculateStatus = (timeIn, timeOut) => {
-  if (timeIn && timeOut) {
-    return "Present";
-  } else if (timeIn && !timeOut) {
-    return "Half Day";
-  } else {
-    return "Absent";
   }
 };
 
@@ -89,23 +103,19 @@ exports.getAttendanceRecordsForStudent = async (req, res) => {
         .json({ message: "No attendance records found for this student" });
     }
 
-    // Calculate status for each attendance record
-    const formattedRecords = attendanceRecords.map((record) => ({
-      ...record.toObject(),
-      status: calculateStatus(record.timeIn, record.timeOut),
-    }));
+    // Calculate status for each attendance record and set it directly in the record
+    attendanceRecords.forEach((record) => {
+      record.status = calculateStatus(record.timeIn, record.timeOut);
+    });
 
-    // Combine student information and attendance records in the response
-    const response = {
+    res.status(200).json({
       student: {
         firstName: student.firstName,
         middleName: student.middleName,
         lastName: student.lastName,
       },
-      attendanceRecords: formattedRecords,
-    };
-
-    res.status(200).json(response);
+      attendanceRecords,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -131,5 +141,16 @@ exports.deleteAllAttendanceRecords = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Helper function to calculate status based on timeIn and timeOut
+const calculateStatus = (timeIn, timeOut) => {
+  if (timeIn && timeOut) {
+    return "Present";
+  } else if (timeIn && !timeOut) {
+    return "Half Day";
+  } else {
+    return "Absent";
   }
 };
