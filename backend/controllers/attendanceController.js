@@ -1,14 +1,14 @@
 const Student = require("../models/student");
 const Attendance = require("../models/attendance");
 
-exports.recordTimeIn = async (req, res) => {
+const recordTimeIn = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
     const currentDate = currentTime.toISOString().slice(0, 10);
 
     // Find the student details based on studentId
-    const student = await Student.findOne({ studentId: studentId });
+    const student = await Student.findOne({ studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -18,24 +18,26 @@ exports.recordTimeIn = async (req, res) => {
     const latestRecord = await Attendance.findOne({
       studentId,
       date: currentDate,
-    }).sort({ timeIn: -1 });
-
-    // Check if a record already exists for today
-    if (latestRecord && latestRecord.timeOut) {
-      return res.status(400).json({
-        message: "Time in already recorded for today, please record time out.",
-      });
-    }
-
-    // Save the time in record for the current day
-    const attendanceRecord = new Attendance({
-      studentId,
-      timeIn: currentTime,
-      date: currentDate,
-      status: "Present", // Set status to "Present" initially
     });
 
-    await attendanceRecord.save();
+    if (!latestRecord) {
+      // If no record exists for today, create a new one with timeIn
+      const newRecord = new Attendance({
+        studentId,
+        timeIn: currentTime,
+        date: currentDate,
+        status: "Half Day", // Initially set as Half Day
+      });
+
+      await newRecord.save();
+      return res.status(201).json({ message: "Time in recorded successfully" });
+    }
+
+    // Update the latest attendance record with the time in
+    latestRecord.timeIn = currentTime;
+    latestRecord.status = "Present"; // Set status to Present when timing in
+
+    await latestRecord.save();
 
     res.status(201).json({ message: "Time in recorded successfully" });
   } catch (error) {
@@ -44,14 +46,14 @@ exports.recordTimeIn = async (req, res) => {
   }
 };
 
-exports.recordTimeOut = async (req, res) => {
+const recordTimeOut = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
     const currentDate = currentTime.toISOString().slice(0, 10);
 
     // Find the student details based on studentId
-    const student = await Student.findOne({ studentId: studentId });
+    const student = await Student.findOne({ studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -61,19 +63,26 @@ exports.recordTimeOut = async (req, res) => {
     const latestRecord = await Attendance.findOne({
       studentId,
       date: currentDate,
-    }).sort({ timeIn: -1 });
+    });
 
-    // Check if a record already exists for today
-    if (!latestRecord || latestRecord.timeOut) {
-      return res.status(400).json({
-        message:
-          "No time in recorded for today or time out already recorded for today",
+    if (!latestRecord) {
+      // If no record exists for today, create a new one with timeOut
+      const newRecord = new Attendance({
+        studentId,
+        timeOut: currentTime,
+        date: currentDate,
+        status: "Halfday", // Initially set as Halfday when timing out directly
       });
+
+      await newRecord.save();
+      return res
+        .status(201)
+        .json({ message: "Time out recorded successfully" });
     }
 
     // Update the latest attendance record with the time out
     latestRecord.timeOut = currentTime;
-    latestRecord.status = "Present"; // Update status to "Present" for this record
+    latestRecord.status = "Present"; // Set status to Present when timing out
 
     await latestRecord.save();
 
@@ -84,56 +93,39 @@ exports.recordTimeOut = async (req, res) => {
   }
 };
 
-exports.getAttendanceRecordsForStudent = async (req, res) => {
+const getAttendanceRecordsForStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
 
+    // Find the student details based on studentId
     const student = await Student.findOne({ studentId: studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // Find all attendance records for the specified student
-    const attendanceRecords = await Attendance.find({ studentId });
+    // Find all attendance records for the student
+    const attendanceRecords = await Attendance.find({ studentId: studentId });
 
-    if (!attendanceRecords) {
-      return res
-        .status(404)
-        .json({ message: "No attendance records found for this student" });
-    }
-
-    // Calculate status for each attendance record and set it directly in the record
-    attendanceRecords.forEach((record) => {
-      record.status = calculateStatus(record.timeIn, record.timeOut);
-    });
-
-    res.status(200).json({
-      student: {
-        firstName: student.firstName,
-        middleName: student.middleName,
-        lastName: student.lastName,
-      },
-      attendanceRecords,
-    });
+    res.status(200).json({ student, attendanceRecords });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-exports.deleteAllAttendanceRecords = async (req, res) => {
+const deleteAllRecordsForStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
 
+    // Find the student details based on studentId
     const student = await Student.findOne({ studentId: studentId });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // Delete all attendance records for the specified student
-    await Attendance.deleteMany({ studentId });
+    // Delete all attendance records for the student
+    await Attendance.deleteMany({ studentId: studentId });
 
     res
       .status(200)
@@ -144,13 +136,9 @@ exports.deleteAllAttendanceRecords = async (req, res) => {
   }
 };
 
-// Helper function to calculate status based on timeIn and timeOut
-const calculateStatus = (timeIn, timeOut) => {
-  if (timeIn && timeOut) {
-    return "Present";
-  } else if (timeIn && !timeOut) {
-    return "Half Day";
-  } else {
-    return "Absent";
-  }
+module.exports = {
+  recordTimeIn,
+  recordTimeOut,
+  getAttendanceRecordsForStudent,
+  deleteAllRecordsForStudent,
 };

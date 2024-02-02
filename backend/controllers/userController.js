@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // User registration controller
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ username: req.body.username });
     if (existingUser) {
@@ -28,20 +28,28 @@ exports.register = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    // If you want to generate a token, you can include it in the response
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      "yourSecretKey",
+      { expiresIn: "1h" }
+    );
+
+    res.status(201).json({ message: "User registered successfully", token });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Registration failed" });
+    console.error("Registration failed:", error.message);
+    res
+      .status(500)
+      .json({ message: "Registration failed", error: error.message });
   }
 };
-
 // User login controller
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
 
     if (!user) {
-      return res.status(401).json({ message: "Authentication failed" });
+      return res.status(401).json({ message: "Invalid Username" });
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -50,7 +58,7 @@ exports.login = async (req, res) => {
     );
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Authentication failed" });
+      return res.status(401).json({ message: "Incorrect password" });
     }
 
     // Generate a JWT token
@@ -70,45 +78,54 @@ exports.login = async (req, res) => {
       message: "Logged in Successfully",
       token,
       userId: user._id,
+      username: user.username,
       grade: user.grade,
       section: user.section,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Authentication failed" });
+    console.error("Authentication failed:", error.message);
+    res
+      .status(500)
+      .json({ message: "Authentication failed", error: error.message });
   }
 };
 
-// Controller method to update the password
-exports.updatePassword = async (req, res) => {
+// Update password controller
+const updatePassword = async (req, res) => {
   try {
-    const { userId, currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body;
 
-    // Find the user by ID
-    const user = await User.findById(userId);
+    // Check if the user exists
+    const user = await User.findOne({ _id: req.user.userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the current password is correct
+    // Verify the current password
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Current password is incorrect" });
+      return res.status(401).json({ message: "Incorrect current password" });
     }
 
     // Hash the new password
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update the user's password in the database
-    await User.findByIdAndUpdate(userId, {
-      password: hashedNewPassword,
-    });
+    // Update the user's password
+    user.password = hashedNewPassword;
+    await user.save();
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Password update failed" });
+    console.error("Password update failed:", error.message);
+    res
+      .status(500)
+      .json({ message: "Password update failed", error: error.message });
   }
+};
+module.exports = {
+  register,
+  login,
+  updatePassword,
 };

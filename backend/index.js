@@ -3,9 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const colors = require("colors");
 const authRoutes = require("./routes/auth");
-const studentRoutes = require("./routes/student");
 const attendanceRoutes = require("./routes/attendanceRoutes");
-const gradesSectionsRoutes = require("./routes/gradesSectionsRoutes");
+const student = require("./routes/studentRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -26,16 +25,14 @@ mongoose.connection.once("open", () => {
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(
-  cors({
-    origin: "https://lnhs.vercel.app",
-  })
-);
+app.use(cors());
+// {
+//   origin: "https://lnhs.vercel.app",
+// }
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api", gradesSectionsRoutes);
-app.use("/api/student", studentRoutes);
+app.use("/student", student);
 app.use("/api/attendance", attendanceRoutes);
 
 //message 404

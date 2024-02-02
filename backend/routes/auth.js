@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const verifyToken = require("../middleware/authMiddleware");
 
 // Registration route
 router.post("/register", userController.register);
@@ -10,6 +11,6 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 
 // Update the password
-router.post("/update-password", userController.updatePassword);
+router.post("/update-password", verifyToken, userController.updatePassword);
 
 module.exports = router;
