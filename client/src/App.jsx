@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import AppRoutes from "./routes/Routes";
-axios.defaults.baseURL = "http://localhost:3000";
+axios.defaults.baseURL = "https://lnhs-api.vercel.app";
 const App = () => {
   return (
     <div>
