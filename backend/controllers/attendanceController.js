@@ -33,13 +33,18 @@ const recordTimeIn = async (req, res) => {
       return res.status(201).json({ message: "Time in recorded successfully" });
     }
 
-    // Update the latest attendance record with the time in
-    latestRecord.timeIn = currentTime;
-    latestRecord.status = "Present"; // Set status to Present when timing in
+    // Check if timeIn is already set
+    if (!latestRecord.timeIn) {
+      // Update the latest attendance record with the time in
+      latestRecord.timeIn = currentTime;
+      latestRecord.status = "Present"; // Set status to Present when timing in
+      await latestRecord.save();
 
-    await latestRecord.save();
-
-    res.status(201).json({ message: "Time in recorded successfully" });
+      res.status(201).json({ message: "Time in recorded successfully" });
+    } else {
+      // Time in is already recorded
+      res.status(400).json({ message: "Student is already timed in" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -71,22 +76,25 @@ const recordTimeOut = async (req, res) => {
         studentId,
         timeOut: currentTime,
         date: currentDate,
-        status: "Halfday", // Initially set as Halfday when timing out directly
+        status: "Half Day", // Initially set as Half Day when timing out directly
       });
 
       await newRecord.save();
-      return res
-        .status(201)
-        .json({ message: "Time out recorded successfully" });
+      return res.status(201).json({ message: "Time out recorded successfully" });
     }
 
-    // Update the latest attendance record with the time out
-    latestRecord.timeOut = currentTime;
-    latestRecord.status = "Present"; // Set status to Present when timing out
+    // Check if timeOut is already set
+    if (!latestRecord.timeOut) {
+      // Update the latest attendance record with the time out
+      latestRecord.timeOut = currentTime;
+      latestRecord.status = "Present"; // Set status to Present when timing out
+      await latestRecord.save();
 
-    await latestRecord.save();
-
-    res.status(201).json({ message: "Time out recorded successfully" });
+      res.status(201).json({ message: "Time out recorded successfully" });
+    } else {
+      // Time out is already recorded
+      res.status(400).json({ message: "Student is already timed out" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
