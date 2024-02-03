@@ -8,6 +8,7 @@ const AttendanceDetails = () => {
   const { studentId } = useParams();
   const [data, setData] = useState("");
   const [attendance, setAttendance] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getData = async () => {
     try {
@@ -38,6 +39,7 @@ const AttendanceDetails = () => {
         },
       });
       setAttendance(response.data.attendanceRecords);
+      setIsLoading(false);
     } catch (error) {
       console.log("Error fetch attendance", error);
     }
@@ -145,52 +147,58 @@ const AttendanceDetails = () => {
           </div>
         </div>
 
-        {attendance.length === 0 ? (
-          <div className="alert alert-danger text-center" role="alert">
-            No attendance record of {data.firstName} {data.middleName}{" "}
-            {data.lastName}
-          </div>
+        {isLoading ? (
+          <div>Loading....</div>
         ) : (
-          <div className="table-responsive">
-            <table className="table text-nowrap">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Time In</th>
-                  <th scope="col">Time Out</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendance &&
-                  attendance.map((attendance, i) => (
-                    <tr key={i} className="table-light">
-                      <td>{formatDate(attendance.date)}</td>
-                      <td>{formatTime(attendance.timeIn, isTimeIn)}</td>
-                      <td>{formatTime(attendance.timeOut, !isTimeIn)}</td>
-                      <td>{attendance.status}</td>
+          <>
+            {attendance.length === 0 ? (
+              <div className="alert alert-danger text-center" role="alert">
+                No attendance record of {data.firstName} {data.middleName}{" "}
+                {data.lastName}
+              </div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table text-nowrap">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Time In</th>
+                      <th scope="col">Time Out</th>
+                      <th scope="col">Status</th>
                     </tr>
-                  ))}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {attendance &&
+                      attendance.map((attendance, i) => (
+                        <tr key={i} className="table-light">
+                          <td>{formatDate(attendance.date)}</td>
+                          <td>{formatTime(attendance.timeIn, isTimeIn)}</td>
+                          <td>{formatTime(attendance.timeOut, !isTimeIn)}</td>
+                          <td>{attendance.status}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
 
-            <div className="d-flex align-items-center justify-content-end gap-3">
-              <button
-                onClick={exportToExcel}
-                type="button"
-                className="btn btn-success"
-              >
-                Export to excel
-              </button>
-              <button
-                onClick={handleDeleteAttendance}
-                type="button"
-                className="btn btn-danger"
-              >
-                Delete All Records
-              </button>
-            </div>
-          </div>
+                <div className="d-flex align-items-center justify-content-end gap-3">
+                  <button
+                    onClick={exportToExcel}
+                    type="button"
+                    className="btn btn-success"
+                  >
+                    Export to excel
+                  </button>
+                  <button
+                    onClick={handleDeleteAttendance}
+                    type="button"
+                    className="btn btn-danger"
+                  >
+                    Delete All Records
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </Layout>
