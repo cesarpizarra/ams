@@ -3,6 +3,7 @@ import Layout from "./Layout";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 const AttendanceDetails = () => {
   const { studentId } = useParams();
   const [data, setData] = useState("");
@@ -103,6 +104,31 @@ const AttendanceDetails = () => {
       console.log("Error", error);
     }
   };
+
+  const exportToExcel = () => {
+    const dataForExport = attendance.map((record) => ({
+      Date: formatDate(record.date),
+      "Time In": formatTime(record.timeIn, isTimeIn),
+      "Time Out": formatTime(record.timeOut, !isTimeIn),
+      Status: record.status,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(dataForExport);
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    // Save the file with the student's name
+    const fileName = `${data.firstName}_${data.middleName}_${data.lastName}_Attendance.xlsx`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+  };
   return (
     <Layout>
       <div className="container-fluid">
@@ -149,7 +175,11 @@ const AttendanceDetails = () => {
             </table>
 
             <div className="d-flex align-items-center justify-content-end gap-3">
-              <button type="button" className="btn btn-success">
+              <button
+                onClick={exportToExcel}
+                type="button"
+                className="btn btn-success"
+              >
                 Export to excel
               </button>
               <button
