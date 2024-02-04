@@ -5,7 +5,7 @@ const recordTimeIn = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
-    const currentDate = currentTime.toISOString().slice(0, 10);
+    const currentDate = currentTime.toLocaleDateString("en-US", { timeZone: "Asia/Manila" });
 
     // Find the student details based on studentId
     const student = await Student.findOne({ studentId });
@@ -55,7 +55,8 @@ const recordTimeOut = async (req, res) => {
   try {
     const { studentId } = req.body;
     const currentTime = new Date();
-    const currentDate = currentTime.toISOString().slice(0, 10);
+   const currentDate = currentTime.toLocaleDateString("en-US", { timeZone: "Asia/Manila" });
+
 
     // Find the student details based on studentId
     const student = await Student.findOne({ studentId });
