@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import Layout from "./Layout";
-import Swal from "sweetalert2";
+import Layout from "../components/Layout";
+import { getStudentByTeacher } from "../services/student";
 
 const StudentList = () => {
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchStudent = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("/student/students", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      setData(response.data.students);
+      const { students } = await getStudentByTeacher();
+      setTimeout(() => {
+        setIsLoading(false);
+        setData(students);
+      }, 1000);
     } catch (error) {
       console.log("Error", error);
+      setIsLoading(false);
     }
   };
 
@@ -25,42 +24,18 @@ const StudentList = () => {
     fetchStudent();
   }, []);
 
-  const handleDeleteStudent = async (studentId) => {
-    try {
-      const token = localStorage.getItem("token");
-
-      // Use SweetAlert for confirmation
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      });
-
-      if (result.isConfirmed) {
-        await axios.delete(`/student/${studentId}`, {
-          headers: {
-            Authorization: token,
-          },
-        });
-        // After deleting the student, re-fetch the updated list
-        fetchStudent();
-        Swal.fire("Deleted!", "Student has been deleted.", "success");
-      }
-    } catch (error) {
-      console.log("Error", error);
-      Swal.fire("Error", "Failed to delete student.", "error");
-    }
-  };
-
   return (
     <Layout>
-      <div>
+      <div className="vh-100 overflow-y-auto py-4">
+        <h1 className="text-center mb-5">Student List</h1>
         <div className="table-responsive">
-          {data.length === 0 ? (
+          {isLoading ? (
+            <div className="d-flex align-items-center justify-content-around vh-100">
+              <div className="spinner-border " role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            </div>
+          ) : data.length === 0 ? (
             <div className="alert alert-danger text-center" role="alert">
               No list of students
             </div>
@@ -95,14 +70,6 @@ const StudentList = () => {
                             View Details
                           </button>
                         </Link>
-
-                        <button
-                          onClick={() => handleDeleteStudent(student.studentId)}
-                          type="button"
-                          className="btn btn-danger"
-                        >
-                          Remove Student
-                        </button>
                       </td>
                     </tr>
                   ))}

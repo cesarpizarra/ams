@@ -78,16 +78,23 @@ const getStudentsByTeacher = async (req, res) => {
   }
 };
 
+// Get all students
+const geAllStudents = async (req, res) => {
+  try {
+    const users = await Student.find();
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve students", error: error.message });
+  }
+};
+
 // Get a specific student by studentId
 const getStudentById = async (req, res) => {
   try {
-    // Ensure that the user is a teacher
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can get student details" });
-    }
-
     const teacherId = req.user._id;
 
     // Retrieve the student by studentId and ensure it belongs to the teacher
@@ -138,9 +145,51 @@ const deleteStudent = async (req, res) => {
       .json({ message: "Failed to delete student", error: error.message });
   }
 };
+
+// Update a student by studentId
+const updateStudent = async (req, res) => {
+  try {
+    const { firstName, middleName, lastName, grade, section } = req.body;
+
+    // Check if grade and section are provided
+    if (!grade || !section) {
+      return res
+        .status(400)
+        .json({ message: "Grade and section are required" });
+    }
+
+    // Find the student by studentId
+    let student = await Student.findOne({
+      studentId: req.params.studentId,
+    });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Update student fields
+    student.firstName = firstName;
+    student.middleName = middleName;
+    student.lastName = lastName;
+    student.grade = grade;
+    student.section = section;
+
+    // Save the updated student
+    await student.save();
+
+    res.status(200).json({ message: "Student updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to update student", error: error.message });
+  }
+};
 module.exports = {
   addStudent,
   getStudentsByTeacher,
   getStudentById,
   deleteStudent,
+  geAllStudents,
+  updateStudent,
 };
