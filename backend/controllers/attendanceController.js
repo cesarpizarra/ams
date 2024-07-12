@@ -95,17 +95,17 @@ const recordTimeOut = async (req, res) => {
 
 const getAttendanceRecordsForStudent = async (req, res) => {
   try {
-    const { studentId } = req.params;
+    const id = req.params.id;
 
     // Find the student details based on studentId
-    const student = await Student.findOne({ studentId: studentId });
+    const student = await Student.findById(id);
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
     // Find all attendance records for the student
-    const attendanceRecords = await Attendance.find({ studentId: studentId });
+    const attendanceRecords = await Attendance.find({ student: id });
 
     res.status(200).json({ student, attendanceRecords });
   } catch (error) {
@@ -113,19 +113,20 @@ const getAttendanceRecordsForStudent = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 const deleteAllRecordsForStudent = async (req, res) => {
   try {
-    const { studentId } = req.params;
+    const id = req.params.id;
 
     // Find the student details based on studentId
-    const student = await Student.findOne({ studentId: studentId });
+    const student = await Student.findById(id);
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
     // Delete all attendance records for the student
-    await Attendance.deleteMany({ studentId: studentId });
+    await Attendance.deleteMany(id);
 
     res
       .status(200)

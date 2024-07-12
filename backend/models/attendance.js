@@ -1,14 +1,18 @@
 const mongoose = require("mongoose");
 
 const attendanceSchema = new mongoose.Schema({
-  studentId: {
-    type: String,
+  student: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Student",
   },
-  date: { type: String },
-  timeIn: { type: String },
-  timeOut: { type: String },
-  status: { type: String },
+  attendance: [
+    {
+      date: { type: String },
+      timeIn: { type: String },
+      timeOut: { type: String },
+      status: { type: String },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Attendance", attendanceSchema);
