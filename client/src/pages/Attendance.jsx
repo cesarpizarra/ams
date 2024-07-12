@@ -83,15 +83,15 @@ const Attendance = () => {
                 <span className="sr-only">Loading...</span>
               </div>
             </div>
-          ) : data.length === 0 ? (
+          ) : filteredData.length === 0 ? (
             <div className="alert alert-danger text-center" role="alert">
-              No list of students
+              No list of students with the selected grade and section.
             </div>
           ) : (
             <table className="table text-nowrap text-center">
               <thead>
                 <tr>
-                  <th scope="col">Student Id</th>
+                  <th scope="col">LRN No.</th>
                   <th scope="col">First Name</th>
                   <th scope="col">Middle Name</th>
                   <th scope="col">Last Name</th>
@@ -106,14 +106,16 @@ const Attendance = () => {
                 {filteredData &&
                   filteredData.map((student, i) => (
                     <tr key={i} className="table-light">
-                      <td>{student.studentId}</td>
+                      <td>{student.lrn}</td>
                       <td>{student.firstName}</td>
                       <td>{student.middleName}</td>
                       <td>{student.lastName}</td>
                       <td>{student.grade}</td>
                       <td>{student.section}</td>
                       <td className="d-flex align-items-center justify-content-center gap-3">
-                        <Link to={`/attendance/${student.studentId}`}>
+                        <Link
+                          to={`/attendance/${student.firstName}/${student.middleName}/${student.lastName}/${student.grade}/${student.section}/${student._id}`}
+                        >
                           <button type="button" className="btn btn-success">
                             View Details
                           </button>

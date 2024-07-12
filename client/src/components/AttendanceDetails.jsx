@@ -1,32 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
-import {
-  deleteAttendance,
-  getStudentAttendance,
-  getStudentData,
-} from "../services/student";
+import { deleteAttendance, getStudentAttendance } from "../services/student";
 import { formatDate, formatTime } from "../utils";
 const AttendanceDetails = () => {
-  const { studentId } = useParams();
-  const [data, setData] = useState("");
+  const { firstName, middleName, lastName, grade, section, studentId } =
+    useParams();
   const [attendance, setAttendance] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await getStudentData(studentId);
-        setData(response);
-      } catch (error) {
-        console.log("Error", error);
-      }
-    };
-
-    getData();
-  }, []);
+  const role = localStorage.getItem("role");
 
   const fetchAttendance = async () => {
     setIsLoading(true);
@@ -34,7 +18,7 @@ const AttendanceDetails = () => {
       const response = await getStudentAttendance(studentId);
       setTimeout(() => {
         setIsLoading(false);
-        setAttendance(response);
+        setAttendance(response || []);
       }, 1500);
     } catch (error) {
       console.log("Error fetch attendance", error);
@@ -46,9 +30,14 @@ const AttendanceDetails = () => {
     fetchAttendance();
   }, []);
 
-  const isTimeIn = !!attendance.timeIn;
-
   const handleDeleteAttendance = async () => {
+    if (attendance.length === 0) {
+      return Swal.fire(
+        "Oops!",
+        "Unable to delete, no data available",
+        "warning"
+      );
+    }
     try {
       // Use SweetAlert for confirmation
       const result = await Swal.fire({
@@ -73,10 +62,13 @@ const AttendanceDetails = () => {
   };
 
   const exportToExcel = () => {
+    if (attendance.length === 0) {
+      return Swal.fire("Oops!", "No data, unable to export", "warning");
+    }
     const dataForExport = attendance.map((record) => ({
       Date: formatDate(record.date),
-      "Time In": formatTime(record.timeIn, isTimeIn),
-      "Time Out": formatTime(record.timeOut, !isTimeIn),
+      "Time In": record.timeIn ? formatTime(record.timeIn) : "N/A",
+      "Time Out": record.timeOut ? formatTime(record.timeOut) : "N/A",
       Status: record.status,
     }));
 
@@ -88,24 +80,30 @@ const AttendanceDetails = () => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
-    // Save the file with the student's name
-    const fileName = `${data.firstName}_${data.middleName}_${data.lastName}_Attendance.xlsx`;
+    const fileName = `${firstName}_${middleName}_${lastName}_Attendance.xlsx`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
     a.click();
   };
+
   return (
     <Layout>
       <div className="container-fluid mt-5">
+        <Link
+          to={`${role === "admin" ? "/attendance" : "/student-list"}`}
+          className="btn btn-secondary"
+        >
+          Back
+        </Link>
         <div className="d-md-flex align-items-center justify-content-between mt-3">
           <h2>
-            {data.firstName} {data.middleName} {data.lastName}
+            {firstName} {middleName} {lastName}
           </h2>
           <div className="d-md-flex gap-4 align-items-center ">
-            <p className="mb-0">Grade: {data.grade}</p>
-            <p className="mb-0">Section: {data.section}</p>
+            <p className="mb-0">Grade: {grade}</p>
+            <p className="mb-0">Section: {section}</p>
 
             <div className="d-flex align-items-center justify-content-end gap-3">
               <button
@@ -134,8 +132,7 @@ const AttendanceDetails = () => {
           </div>
         ) : attendance.length === 0 ? (
           <div className="alert alert-danger text-center" role="alert">
-            No attendance record of {data.firstName} {data.middleName}{" "}
-            {data.lastName}
+            No attendance record
           </div>
         ) : (
           <div className="table-responsive">
@@ -150,19 +147,23 @@ const AttendanceDetails = () => {
               </thead>
               <tbody>
                 {attendance &&
-                  attendance.map((attendance, i) => (
+                  attendance.map((record, i) => (
                     <tr key={i} className="table-light">
-                      <td>{formatDate(attendance.date)}</td>
-                      <td>{formatTime(attendance.timeIn, isTimeIn)}</td>
-                      <td>{formatTime(attendance.timeOut, !isTimeIn)}</td>
+                      <td>{formatDate(record.date)}</td>
+                      <td>
+                        {record.timeIn ? formatTime(record.timeIn) : "N/A"}
+                      </td>
+                      <td>
+                        {record.timeOut ? formatTime(record.timeOut) : "N/A"}
+                      </td>
                       <td
                         className={`${
-                          attendance.status === "Present"
+                          record.status === "Present"
                             ? "text-success"
                             : "text-warning"
                         }`}
                       >
-                        {attendance.status}
+                        {record.status}
                       </td>
                     </tr>
                   ))}

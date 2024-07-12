@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { getAllStudents } from "../services/student";
-import UpdateStudent from "../modal/UpdateStudent";
-
+import { Link } from "react-router-dom";
+import { MdOutlineSettings } from "react-icons/md";
 const Students = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState("7");
   const [selectedSection, setSelectedSection] = useState("1");
-  const [selectedId, setSelectedId] = useState("");
   const fetchStudent = async () => {
     try {
       const { students } = await getAllStudents();
@@ -32,24 +31,20 @@ const Students = () => {
       (!selectedSection || student.section === selectedSection)
     );
   });
-  const handleSelectId = (id) => {
-    setSelectedId(id);
-  };
+
   return (
     <Layout>
-      {selectedId && <UpdateStudent selectedId={selectedId} />}
       <div className="vh-100 overflow-y-auto py-4">
         <h1 className="text-center mb-5">Students</h1>
-        <div className="table-responsive">
-          <div className="container">
-            <div className="row align-items-center mb-3">
-              <div className="col-md-2">
-                <h3 className="px-3">Filter</h3>
-              </div>
 
-              <div className="col-md-2 d-flex align-items-center">
+        <div className="table-responsive">
+          <div className="container d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center w-50 gap-4">
+              <h3 className="px-3">Filter</h3>
+
+              <div className="d-flex align-items-center w-50">
                 <label htmlFor="level" className="me-2">
-                  Level
+                  Level:
                 </label>
                 <select
                   onChange={(e) => setSelectedGrade(e.target.value)}
@@ -64,10 +59,9 @@ const Students = () => {
                   <option value="12">12</option>
                 </select>
               </div>
-              <div className="col-md-2 d-flex align-items-center">
-                <label htmlFor="level" className="me-2">
-                  Section
-                </label>
+
+              <div className="d-flex align-items-center w-50">
+                <label htmlFor="level">Section:</label>
                 <select
                   onChange={(e) => setSelectedSection(e.target.value)}
                   className="form-select"
@@ -78,6 +72,13 @@ const Students = () => {
                 </select>
               </div>
             </div>
+
+            <Link to="/advance-settings">
+              <button type="button" className="btn btn-warning">
+                <MdOutlineSettings />
+                <span>Advance Settings</span>
+              </button>
+            </Link>
           </div>
 
           {isLoading ? (
@@ -86,15 +87,17 @@ const Students = () => {
                 <span className="sr-only">Loading...</span>
               </div>
             </div>
-          ) : data.length === 0 ? (
-            <div className="alert alert-danger text-center" role="alert">
-              No list of students
+          ) : filteredData.length === 0 ? (
+            <div className="py-5">
+              <div className="alert alert-danger text-center" role="alert">
+                No list of students with the selected grade and section.
+              </div>
             </div>
           ) : (
             <table className="table text-nowrap text-center">
               <thead>
                 <tr>
-                  <th scope="col">Student Id</th>
+                  <th scope="col">LRN No.</th>
                   <th scope="col">First Name</th>
                   <th scope="col">Middle Name</th>
                   <th scope="col">Last Name</th>
@@ -109,19 +112,16 @@ const Students = () => {
                 {filteredData &&
                   filteredData.map((student, i) => (
                     <tr key={i} className="table-light">
-                      <td>{student.studentId}</td>
+                      <td>{student.lrn}</td>
                       <td>{student.firstName}</td>
                       <td>{student.middleName}</td>
                       <td>{student.lastName}</td>
                       <td>{student.grade}</td>
                       <td>{student.section}</td>
                       <td className="d-flex align-items-center justify-content-center gap-3">
-                        <button
-                          onClick={(e) => handleSelectId(student.studentId)}
-                          data-bs-toggle="modal"
-                          data-bs-target="#updateStudent"
-                          type="button"
-                          className="btn btn-success"
+                        <Link
+                          to={`/update-student/${student._id}`}
+                          className="bg-success text-white text-decoration-none px-3 rounded py-1"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +138,7 @@ const Students = () => {
                             />
                           </svg>
                           Edit
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

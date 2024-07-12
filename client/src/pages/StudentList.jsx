@@ -7,20 +7,20 @@ const StudentList = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchStudent = async () => {
-    try {
-      const { students } = await getStudentByTeacher();
-      setTimeout(() => {
-        setIsLoading(false);
-        setData(students);
-      }, 1000);
-    } catch (error) {
-      console.log("Error", error);
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchStudent = async () => {
+      try {
+        const { students } = await getStudentByTeacher();
+        setTimeout(() => {
+          setIsLoading(false);
+          setData(students);
+        }, 1000);
+      } catch (error) {
+        console.log("Error", error);
+        setIsLoading(false);
+      }
+    };
+
     fetchStudent();
   }, []);
 
@@ -43,7 +43,7 @@ const StudentList = () => {
             <table className="table text-nowrap text-center">
               <thead>
                 <tr>
-                  <th scope="col">Student Id</th>
+                  <th scope="col">LRN No.</th>
                   <th scope="col">First Name</th>
                   <th scope="col">Middle Name</th>
                   <th scope="col">Last Name</th>
@@ -58,14 +58,16 @@ const StudentList = () => {
                 {data &&
                   data.map((student, i) => (
                     <tr key={i} className="table-light">
-                      <td>{student.studentId}</td>
+                      <td>{student.lrn}</td>
                       <td>{student.firstName}</td>
                       <td>{student.middleName}</td>
                       <td>{student.lastName}</td>
                       <td>{student.grade}</td>
                       <td>{student.section}</td>
                       <td className="d-flex align-items-center justify-content-center gap-3">
-                        <Link to={`/attendance/${student.studentId}`}>
+                        <Link
+                          to={`/attendance/${student.firstName}/${student.middleName}/${student.lastName}/${student.grade}/${student.section}/${student._id}`}
+                        >
                           <button type="button" className="btn btn-success">
                             View Details
                           </button>

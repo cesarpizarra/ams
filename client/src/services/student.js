@@ -87,9 +87,46 @@ export const updateStudent = async (studentId, updatedData) => {
   try {
     const response = await axios.put(
       `/student/update/${studentId}`,
+      updatedData,
       {
-        studentId,
-        updatedData,
+        headers: {
+          Authorization: getToken,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const updateGrades = async (currentGrade, targetGrade) => {
+  try {
+    const response = await axios.put(
+      "/student/update-grades",
+      {
+        currentGrade,
+        targetGrade,
+      },
+      {
+        headers: {
+          Authorization: getToken,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const updateSection = async (studentIds, targetSection) => {
+  try {
+    const response = await axios.put(
+      "/student/update-section",
+      {
+        studentIds,
+        targetSection,
       },
       {
         headers: {

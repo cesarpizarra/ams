@@ -4,31 +4,13 @@ import { getAllStudents, getStudentByTeacher } from "../services/student";
 import { Card } from "react-bootstrap";
 import CountUp from "react-countup";
 import { getCurrentPhilippineTime } from "../utils/getDate";
+import Chart from "./Chart";
 const Dashboard = () => {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [totalStudents, setTotalStudents] = useState("");
   const [totalStudentFromTeacher, setTotalStudentFromTeacher] = useState("");
   // Retrieve the username from local storage
   const username = localStorage.getItem("username");
   const role = localStorage.getItem("role");
-
-  const fetchStudent = async () => {
-    try {
-      const response = await getStudentByTeacher();
-      setTimeout(() => {
-        setIsLoading(false);
-        setData(response);
-      }, 1000);
-    } catch (error) {
-      console.log("Error", error);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchStudent();
-  }, []);
 
   useEffect(() => {
     const getLength = async () => {
@@ -37,7 +19,6 @@ const Dashboard = () => {
         setTotalStudents(length);
       } catch (error) {
         console.log("Error", error);
-        setIsLoading(false);
       }
     };
     getLength();
@@ -50,7 +31,6 @@ const Dashboard = () => {
         setTotalStudentFromTeacher(length);
       } catch (error) {
         console.log("Error", error);
-        setIsLoading(false);
       }
     };
     getStudentLengthFromTeacher();
@@ -67,6 +47,12 @@ const Dashboard = () => {
 
           <p className="">{getCurrentPhilippineTime()}</p>
         </div>
+
+        {role === "admin" && (
+          <div className="py-5">
+            <Chart />
+          </div>
+        )}
         <div className="row mb-4">
           <div className="col-md-4">
             <Card>

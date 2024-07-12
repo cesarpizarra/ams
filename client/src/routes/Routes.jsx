@@ -8,6 +8,10 @@ import Students from "../pages/Students";
 import Teachers from "../pages/Teachers";
 import Attendance from "../pages/Attendance";
 import StudentList from "../pages/StudentList";
+import UpdateStudent from "../modal/UpdateStudent";
+import AdvanceSettings from "../pages/AdvanceSettings";
+import UpdateGrades from "../pages/UpdateGrades";
+import UpdateSection from "../pages/UpdateSections";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -45,6 +49,14 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/update-student/:id"
+        element={
+          <RequireAuth>
+            <UpdateStudent />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/teachers"
         element={
           <RequireAuth>
@@ -53,7 +65,32 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/attendance/:studentId"
+        path="/advance-settings"
+        element={
+          <RequireAuth>
+            <AdvanceSettings />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/advance-settings/update-grades"
+        element={
+          <RequireAuth>
+            <UpdateGrades />
+          </RequireAuth>
+        }
+      />
+
+      <Route
+        path="/advance-settings/update-sections"
+        element={
+          <RequireAuth>
+            <UpdateSection />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/attendance/:firstName/:middleName/:lastName/:grade/:section/:studentId"
         element={
           <RequireAuth>
             <AttendanceDetails />
