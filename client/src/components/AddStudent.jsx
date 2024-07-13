@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { getToken } from "../utils/getToken";
 
 const AddStudent = () => {
   const initialFormData = {
@@ -27,10 +28,9 @@ const AddStudent = () => {
     setMessage(null);
 
     try {
-      const token = localStorage.getItem("token");
       await axios.post("/student/add", formData, {
         headers: {
-          Authorization: token,
+          Authorization: getToken,
         },
       });
       setFormData(initialFormData);

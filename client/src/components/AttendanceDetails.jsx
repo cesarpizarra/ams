@@ -6,7 +6,7 @@ import * as XLSX from "xlsx";
 import { deleteAttendance, getStudentAttendance } from "../services/student";
 import { formatDate, formatTime } from "../utils";
 const AttendanceDetails = () => {
-  const { firstName, middleName, lastName, grade, section, studentId } =
+  const { firstName, middleName, lastName, grade, section, lrn, studentId } =
     useParams();
   const [attendance, setAttendance] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +15,7 @@ const AttendanceDetails = () => {
   const fetchAttendance = async () => {
     setIsLoading(true);
     try {
-      const response = await getStudentAttendance(studentId);
+      const response = await getStudentAttendance(lrn);
       setTimeout(() => {
         setIsLoading(false);
         setAttendance(response || []);

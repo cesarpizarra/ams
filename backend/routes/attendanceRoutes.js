@@ -6,7 +6,7 @@ const verifyToken = require("../middleware/authMiddleware");
 router.post("/timein", attendanceController.recordTimeIn);
 router.post("/timeout", attendanceController.recordTimeOut);
 router.get(
-  "/student/:id",
+  "/student/:lrn",
   verifyToken,
   attendanceController.getAttendanceRecordsForStudent
 );

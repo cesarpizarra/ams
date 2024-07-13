@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getToken } from "../utils/getToken";
-
 export const getAllStudents = async () => {
   try {
     const response = await axios.get("/student/all/students", {
@@ -9,7 +8,7 @@ export const getAllStudents = async () => {
       },
     });
 
-    const students = response.data;
+    const students = response.data || [];
     const length = students.length;
 
     return { students, length };
@@ -96,7 +95,8 @@ export const updateStudent = async (studentId, updatedData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error:", error);
+    const errorMessage = error.response?.data?.message || "An error occurred";
+    throw new Error(errorMessage);
   }
 };
 
@@ -134,6 +134,15 @@ export const updateSection = async (studentIds, targetSection) => {
         },
       }
     );
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const deleteStudent = async (studentId) => {
+  try {
+    const response = await axios.delete(`/student/${studentId}`);
     return response.data;
   } catch (error) {
     console.error("Error:", error);

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { getToken } from "../utils/getToken";
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
     currentPassword: "",
@@ -19,10 +20,9 @@ const ChangePassword = () => {
     setMessage(null);
 
     try {
-      const token = localStorage.getItem("token");
       await axios.post("/api/auth/update-password", formData, {
         headers: {
-          Authorization: token,
+          Authorization: getToken,
         },
       });
 

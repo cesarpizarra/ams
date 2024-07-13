@@ -1,5 +1,4 @@
 const Student = require("../models/student");
-
 // add a student
 const addStudent = async (req, res) => {
   try {
@@ -123,7 +122,7 @@ const deleteStudent = async (req, res) => {
 const updateStudent = async (req, res) => {
   try {
     const id = req.params.id;
-    const { firstName, middleName, lastName, grade, section } = req.body;
+    const { lrn, firstName, middleName, lastName, grade, section } = req.body;
 
     // Check if grade and section are provided
     if (!grade || !section) {
@@ -139,7 +138,19 @@ const updateStudent = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
+    // Check if LRN already exists for another student
+    if (lrn !== student.lrn) {
+      const existingStudentWithLRN = await Student.findOne({ lrn });
+
+      if (
+        existingStudentWithLRN &&
+        existingStudentWithLRN._id.toString() !== id
+      ) {
+        return res.status(400).json({ message: "LRN already exists" });
+      }
+    }
     // Update student fields
+    student.lrn = lrn;
     student.firstName = firstName;
     student.middleName = middleName;
     student.lastName = lastName;

@@ -90,7 +90,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/attendance/:firstName/:middleName/:lastName/:grade/:section/:studentId"
+        path="/attendance/:firstName/:middleName/:lastName/:grade/:section/:lrn/:studentId"
         element={
           <RequireAuth>
             <AttendanceDetails />

@@ -15,6 +15,7 @@ const UpdateStudent = () => {
     section: "",
   });
   const navigate = useNavigate();
+  const [error, setError] = useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -43,7 +44,8 @@ const UpdateStudent = () => {
       Swal.fire("Success", "Student updated successfully", "success");
       navigate("/students");
     } catch (error) {
-      console.log("Error", error);
+      console.error("Error", error.message);
+      setError(error.message);
     }
   };
   return (
@@ -52,8 +54,14 @@ const UpdateStudent = () => {
         <Link to="/students" className="btn btn-secondary">
           Back
         </Link>
-        <div>
+        <div className="mt-4">
           <h1>Update Student</h1>
+
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
         </div>
         <div>
           <form onSubmit={handleSubmit}>

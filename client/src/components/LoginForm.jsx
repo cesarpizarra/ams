@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoggingIn(true);
     try {
-      const response = await axios.post("api/auth/login", {
+      const response = await axios.post("/api/auth/login", {
         username,
         password,
       });
@@ -21,7 +19,7 @@ const LoginForm = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("username", response.data.username);
         localStorage.setItem("role", response.data.role);
-        navigate("/dashboard");
+        window.location.href = "/dashboard";
       }, 1500);
     } catch (error) {
       console.log("Error: " + error);
