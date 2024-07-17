@@ -5,13 +5,9 @@ const recordTimeIn = async (req, res) => {
   try {
     const { lrn } = req.body;
     const currentTime = new Date();
-<<<<<<< HEAD
     const currentDate = currentTime.toLocaleDateString("en-US", {
       timeZone: "Asia/Manila",
     });
-=======
-    const currentDate = currentTime.toLocaleDateString("en-US", { timeZone: "Asia/Manila" });
->>>>>>> 0efa3307e459df5b39ba8e492d20ee19539ae7b5
 
     // Find the student details based on lrn
     const student = await Student.findOne({ lrn });
@@ -61,14 +57,9 @@ const recordTimeOut = async (req, res) => {
   try {
     const { lrn } = req.body;
     const currentTime = new Date();
-<<<<<<< HEAD
     const currentDate = currentTime.toLocaleDateString("en-US", {
       timeZone: "Asia/Manila",
     });
-=======
-   const currentDate = currentTime.toLocaleDateString("en-US", { timeZone: "Asia/Manila" });
-
->>>>>>> 0efa3307e459df5b39ba8e492d20ee19539ae7b5
 
     // Find the student details based on lrn
     const student = await Student.findOne({ lrn });
@@ -93,7 +84,9 @@ const recordTimeOut = async (req, res) => {
       });
 
       await newRecord.save();
-      return res.status(201).json({ message: "Time out recorded successfully" });
+      return res
+        .status(201)
+        .json({ message: "Time out recorded successfully" });
     }
 
     // Check if timeOut is already set
