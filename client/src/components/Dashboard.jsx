@@ -114,7 +114,7 @@ const Dashboard = () => {
               <Card.Body>
                 <Card.Title>Today's Time In</Card.Title>
                 <Card.Text>
-                  {<CountUp end={totalTimein} duration={3} />}
+                  {<CountUp end={totalTimein} duration={2} />}
                 </Card.Text>
               </Card.Body>
             </Card>
@@ -123,7 +123,7 @@ const Dashboard = () => {
             <Card>
               <Card.Body>
                 <Card.Title>Today's Time Out</Card.Title>
-                {<CountUp end={totalTimeout} duration={3} />}
+                {<CountUp end={totalTimeout} duration={2} />}
               </Card.Body>
             </Card>
           </div>

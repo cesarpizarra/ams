@@ -10,12 +10,15 @@ const UpdateGrades = () => {
   const [targetGrade, setTargetGrade] = useState("7");
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchStudents = async () => {
       try {
         const { students } = await getAllStudents();
         setStudents(students);
+        setIsLoading(false);
       } catch (error) {
         console.log("Error fetching students", error);
+        setIsLoading(false);
       }
     };
 
@@ -92,11 +95,7 @@ const UpdateGrades = () => {
                   type="button"
                   className="btn btn-primary"
                   onClick={handleGradeUpdate}
-                  disabled={
-                    isLoading ||
-                    students.filter((student) => student.grade === currentGrade)
-                      .length === 0
-                  }
+                  disabled={isLoading || currentGrade === targetGrade}
                 >
                   {isLoading ? "Updating..." : "Update Grade"}
                 </button>
@@ -108,7 +107,6 @@ const UpdateGrades = () => {
         {/* Optionally, display a list of students here for review */}
         {isLoading ? (
           <div className="d-flex justify-content-center align-items-center mt-5 flex-column">
-            Updating...
             <div className="spinner-border " role="status">
               <span className="sr-only">Loading...</span>
             </div>
