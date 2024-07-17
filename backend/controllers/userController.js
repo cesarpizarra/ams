@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
 // User registration controller
 const register = async (req, res) => {
   try {
@@ -81,6 +80,7 @@ const login = async (req, res) => {
       username: user.username,
       grade: user.grade,
       section: user.section,
+      role: user.role,
     });
   } catch (error) {
     console.error("Authentication failed:", error.message);
@@ -124,8 +124,23 @@ const updatePassword = async (req, res) => {
       .json({ message: "Password update failed", error: error.message });
   }
 };
+
+const geAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve users", error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
   updatePassword,
+  geAllUsers,
 };

@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { getToken } from "../utils/getToken";
+
 const AddStudent = () => {
-  const [formData, setFormData] = useState({
+  const initialFormData = {
+    lrn: "",
     firstName: "",
     lastName: "",
     middleName: "",
     grade: "",
     section: "",
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
   const [message, setMessage] = useState(null);
 
   const handleChange = (e) => {
@@ -23,24 +28,20 @@ const AddStudent = () => {
     setMessage(null);
 
     try {
-      const token = localStorage.getItem("token");
       await axios.post("/student/add", formData, {
         headers: {
-          Authorization: token,
+          Authorization: getToken,
         },
       });
-      window.location.reload();
-      setFormData({
-        firstName: "",
-        lastName: "",
-        middleName: "",
-        grade: "",
-        section: "",
-      });
+      setFormData(initialFormData);
       setMessage("Student added successfully!");
     } catch (error) {
       console.error("Error:", error);
       setMessage(error.response.data.message);
+
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
     }
   };
 
@@ -68,6 +69,18 @@ const AddStudent = () => {
             </div>
             <div className="modal-body">
               <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label className="col-form-label">LRN No:</label>
+                  <input
+                    placeholder="Enter LRN No."
+                    type="number"
+                    className="form-control"
+                    name="lrn"
+                    value={formData.lrn}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
                 <div className="mb-3">
                   <label className="col-form-label">First Name:</label>
                   <input
@@ -144,7 +157,7 @@ const AddStudent = () => {
                   </select>
                 </div>
                 <div className="modal-footer">
-                  {message ? (
+                  {message && (
                     <div
                       className={
                         message.includes("successfully")
@@ -155,7 +168,7 @@ const AddStudent = () => {
                     >
                       {message}
                     </div>
-                  ) : null}
+                  )}
                   <button
                     type="button"
                     className="btn btn-secondary"

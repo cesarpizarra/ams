@@ -1,47 +1,28 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
-import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
+import { deleteAttendance, getStudentAttendance } from "../services/student";
+import { formatDate, formatTime } from "../utils";
 const AttendanceDetails = () => {
-  const { studentId } = useParams();
-  const [data, setData] = useState("");
+  const { firstName, middleName, lastName, grade, section, lrn, studentId } =
+    useParams();
   const [attendance, setAttendance] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const getData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`/student/${studentId}`, {
-        headers: {
-          Authorization: token,
-        },
-      });
-
-      setData(response.data.student);
-    } catch (error) {
-      console.log("Error", error);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
+  const role = localStorage.getItem("role");
 
   const fetchAttendance = async () => {
+    setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
-
-      const response = await axios.get(`/api/attendance/student/${studentId}`, {
-        headers: {
-          Authorization: token,
-        },
-      });
-      setAttendance(response.data.attendanceRecords);
-      setIsLoading(false);
+      const response = await getStudentAttendance(lrn);
+      setTimeout(() => {
+        setIsLoading(false);
+        setAttendance(response || []);
+      }, 1500);
     } catch (error) {
       console.log("Error fetch attendance", error);
+      setIsLoading(false);
     }
   };
 
@@ -49,39 +30,15 @@ const AttendanceDetails = () => {
     fetchAttendance();
   }, []);
 
-  const formatDate = (dateString) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("en-US", options);
-  };
-
-  const formatTime = (timeString, isTimeIn) => {
-    const options = {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    };
-
-    // Check if it's time in or time out based on the availability of timeString
-    if (!timeString && isTimeIn) {
-      return "No Time Out";
-    } else if (!timeString && !isTimeIn) {
-      return "No Time In";
-    }
-
-    // If timeString is available, format and return the time
-    return new Date(timeString).toLocaleTimeString("en-US", options);
-  };
-
-  const isTimeIn = !!attendance.timeIn;
-
   const handleDeleteAttendance = async () => {
+    if (attendance.length === 0) {
+      return Swal.fire(
+        "Oops!",
+        "Unable to delete, no data available",
+        "warning"
+      );
+    }
     try {
-      const token = localStorage.getItem("token");
-
       // Use SweetAlert for confirmation
       const result = await Swal.fire({
         title: "Are you sure?",
@@ -94,11 +51,8 @@ const AttendanceDetails = () => {
       });
 
       if (result.isConfirmed) {
-        await axios.delete(`/api/attendance/delete/${studentId}`, {
-          headers: {
-            Authorization: token,
-          },
-        });
+        await deleteAttendance(lrn);
+
         fetchAttendance();
         Swal.fire("Deleted!", "Student has been deleted.", "success");
       }
@@ -108,10 +62,13 @@ const AttendanceDetails = () => {
   };
 
   const exportToExcel = () => {
+    if (attendance.length === 0) {
+      return Swal.fire("Oops!", "No data, unable to export", "warning");
+    }
     const dataForExport = attendance.map((record) => ({
       Date: formatDate(record.date),
-      "Time In": formatTime(record.timeIn, isTimeIn),
-      "Time Out": formatTime(record.timeOut, !isTimeIn),
+      "Time In": record.timeIn ? formatTime(record.timeIn) : "No Time In",
+      "Time Out": record.timeOut ? formatTime(record.timeOut) : "No Time Out",
       Status: record.status,
     }));
 
@@ -123,82 +80,100 @@ const AttendanceDetails = () => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
-    // Save the file with the student's name
-    const fileName = `${data.firstName}_${data.middleName}_${data.lastName}_Attendance.xlsx`;
+    const fileName = `${firstName}_${middleName}_${lastName}_Attendance.xlsx`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
     a.click();
   };
+
   return (
     <Layout>
-      <div className="container-fluid">
-        <Link to="/students">
-          <button className="btn btn-secondary mt-4">Back</button>
+      <div className="container-fluid mt-5">
+        <Link
+          to={`${role === "admin" ? "/attendance" : "/student-list"}`}
+          className="btn btn-secondary"
+        >
+          Back
         </Link>
         <div className="d-md-flex align-items-center justify-content-between mt-3">
           <h2>
-            {data.firstName} {data.middleName} {data.lastName}
+            {firstName} {middleName} {lastName}
           </h2>
-          <div className="d-flex gap-4">
-            <p>Grade: {data.grade}</p>
-            <p>Section: {data.section}</p>
+          <div className="d-md-flex gap-4 align-items-center ">
+            <p className="mb-0">Grade: {grade}</p>
+            <p className="mb-0">Section: {section}</p>
+
+            <div className="d-flex align-items-center justify-content-end gap-3">
+              <button
+                onClick={exportToExcel}
+                type="button"
+                className="btn btn-success"
+              >
+                Export to excel
+              </button>
+              <button
+                onClick={handleDeleteAttendance}
+                type="button"
+                className="btn btn-danger"
+              >
+                Delete All Records
+              </button>
+            </div>
           </div>
         </div>
 
         {isLoading ? (
-          <div>Loading....</div>
+          <div className="d-flex align-items-center justify-content-center vh-100">
+            <div className="spinner-border " role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+          </div>
+        ) : attendance.length === 0 ? (
+          <div className="alert alert-danger text-center" role="alert">
+            No attendance record
+          </div>
         ) : (
-          <>
-            {attendance.length === 0 ? (
-              <div className="alert alert-danger text-center" role="alert">
-                No attendance record of {data.firstName} {data.middleName}{" "}
-                {data.lastName}
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table text-nowrap">
-                  <thead>
-                    <tr>
-                      <th scope="col">Date</th>
-                      <th scope="col">Time In</th>
-                      <th scope="col">Time Out</th>
-                      <th scope="col">Status</th>
+          <div className="table-responsive">
+            <table className="table text-nowrap">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Time In</th>
+                  <th scope="col">Time Out</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendance &&
+                  attendance.map((record, i) => (
+                    <tr key={i} className="table-light">
+                      <td>{formatDate(record.date)}</td>
+                      <td>
+                        {record.timeIn
+                          ? formatTime(record.timeIn)
+                          : "No Time In"}
+                      </td>
+                      <td>
+                        {record.timeOut
+                          ? formatTime(record.timeOut)
+                          : "No Time Out"}
+                      </td>
+                      <td
+                        className={`${
+                          record.status === "Present"
+                            ? "text-success"
+                            : "text-warning"
+                        }`}
+                      >
+                        {record.status}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {attendance &&
-                      attendance.map((attendance, i) => (
-                        <tr key={i} className="table-light">
-                          <td>{formatDate(attendance.date)}</td>
-                          <td>{formatTime(attendance.timeIn, isTimeIn)}</td>
-                          <td>{formatTime(attendance.timeOut, !isTimeIn)}</td>
-                          <td>{attendance.status}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-
-                <div className="d-flex align-items-center justify-content-end gap-3">
-                  <button
-                    onClick={exportToExcel}
-                    type="button"
-                    className="btn btn-success"
-                  >
-                    Export to excel
-                  </button>
-                  <button
-                    onClick={handleDeleteAttendance}
-                    type="button"
-                    className="btn btn-danger"
-                  >
-                    Delete All Records
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </Layout>

@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 
 const attendanceSchema = new mongoose.Schema({
-  studentId: {
-    type: String,
-    ref: "Student",
-  },
+  lrn: { type: String },
   date: { type: String },
   timeIn: { type: String },
   timeOut: { type: String },

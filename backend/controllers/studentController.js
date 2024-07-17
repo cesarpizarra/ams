@@ -1,44 +1,33 @@
 const Student = require("../models/student");
-let currentStudentIdCount = 1;
-
 // add a student
 const addStudent = async (req, res) => {
   try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can add students" });
-    }
-
-    const teacherId = req.user._id;
-
     const teacherGrade = req.user.grade;
     const teacherSection = req.user.section;
 
-    const { firstName, middleName, lastName, grade, section } = req.body;
+    const { lrn, firstName, middleName, lastName, grade, section } = req.body;
 
-    // Check if the teacher is adding a student to their own grade and section
-    if (grade !== teacherGrade || section !== teacherSection) {
-      return res.status(403).json({
-        message:
-          "Teachers can only add students to their own grade and section",
-      });
+    // Check if the user is an admin
+    if (req.user.role !== "admin") {
+      // If not admin, check if the teacher is adding a student to their own grade and section
+      if (grade !== teacherGrade || section !== teacherSection) {
+        return res.status(403).json({
+          message:
+            "Teachers can only add students to their own grade and section",
+        });
+      }
+
+      // Check if grade and section are provided
+      if (!grade || !section) {
+        return res
+          .status(400)
+          .json({ message: "Grade and section are required" });
+      }
     }
-
-    if (!grade || !section) {
-      return res
-        .status(400)
-        .json({ message: "Grade and section are required" });
-    }
-
-    // Generate a unique student ID
-    const paddedId = String(currentStudentIdCount).padStart(3, "0");
-    const studentId = `000-${grade}-${section}-${paddedId}`;
 
     // Create a new student
     const student = new Student({
-      userId: teacherId,
-      studentId,
+      lrn,
       firstName,
       middleName,
       lastName,
@@ -47,9 +36,6 @@ const addStudent = async (req, res) => {
     });
 
     await student.save();
-
-    // Increment the student ID count for the next student
-    currentStudentIdCount++;
 
     res.status(201).json({ message: "Student added successfully" });
   } catch (error) {
@@ -78,23 +64,26 @@ const getStudentsByTeacher = async (req, res) => {
   }
 };
 
+// Get all students
+const geAllStudents = async (req, res) => {
+  try {
+    const users = await Student.find();
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve students", error: error.message });
+  }
+};
+
 // Get a specific student by studentId
 const getStudentById = async (req, res) => {
   try {
-    // Ensure that the user is a teacher
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can get student details" });
-    }
-
-    const teacherId = req.user._id;
-
+    const id = req.params.id;
     // Retrieve the student by studentId and ensure it belongs to the teacher
-    const student = await Student.findOne({
-      studentId: req.params.studentId,
-      userId: teacherId,
-    });
+    const student = await Student.findById(id);
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -111,20 +100,10 @@ const getStudentById = async (req, res) => {
 // Delete a student by studentId
 const deleteStudent = async (req, res) => {
   try {
-    // Ensure that the user is a teacher
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can delete students" });
-    }
-
-    const teacherId = req.user._id;
+    const id = req.parmas.id;
 
     // Delete the student by studentId and ensure it belongs to the teacher
-    const deletedStudent = await Student.findOneAndDelete({
-      studentId: req.params.studentId,
-      userId: teacherId,
-    });
+    const deletedStudent = await Student.findOneAndDelete(id);
 
     if (!deletedStudent) {
       return res.status(404).json({ message: "Student not found" });
@@ -138,9 +117,114 @@ const deleteStudent = async (req, res) => {
       .json({ message: "Failed to delete student", error: error.message });
   }
 };
+
+// Update a student by studentId
+const updateStudent = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { lrn, firstName, middleName, lastName, grade, section } = req.body;
+
+    // Check if grade and section are provided
+    if (!grade || !section) {
+      return res
+        .status(400)
+        .json({ message: "Grade and section are required" });
+    }
+
+    // Find the student by studentId
+    let student = await Student.findById(id);
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Check if LRN already exists for another student
+    if (lrn !== student.lrn) {
+      const existingStudentWithLRN = await Student.findOne({ lrn });
+
+      if (
+        existingStudentWithLRN &&
+        existingStudentWithLRN._id.toString() !== id
+      ) {
+        return res.status(400).json({ message: "LRN already exists" });
+      }
+    }
+    // Update student fields
+    student.lrn = lrn;
+    student.firstName = firstName;
+    student.middleName = middleName;
+    student.lastName = lastName;
+    student.grade = grade;
+    student.section = section;
+
+    // Save the updated student
+    await student.save();
+
+    res.status(200).json({ message: "Student updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to update student", error: error.message });
+  }
+};
+
+// Controller function to update student grades
+const updateStudentGrade = async (req, res) => {
+  const { currentGrade, targetGrade } = req.body;
+
+  try {
+    const filter = { grade: currentGrade };
+    const update = { grade: targetGrade };
+
+    // Update all students matching the currentGrade to targetGrade
+    const updateResult = await Student.updateMany(filter, update);
+
+    res.status(200).json({
+      success: true,
+      message: `Updated ${updateResult.nModified} students from grade ${currentGrade} to grade ${targetGrade}`,
+    });
+  } catch (error) {
+    console.error("Error updating grades:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update student grades",
+      error: error.message,
+    });
+  }
+};
+
+// Controller function to update student sections by _id
+const updateStudentSectionById = async (req, res) => {
+  const { studentIds, targetSection } = req.body;
+
+  try {
+    // Update all students matching the _ids to targetSection
+    await Student.updateMany(
+      { _id: { $in: studentIds } },
+      { section: targetSection }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Updated success",
+    });
+  } catch (error) {
+    console.error("Error updating sections:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update student sections",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   addStudent,
   getStudentsByTeacher,
   getStudentById,
   deleteStudent,
+  geAllStudents,
+  updateStudent,
+  updateStudentGrade,
+  updateStudentSectionById,
 };

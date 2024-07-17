@@ -4,7 +4,7 @@ const cors = require("cors");
 const colors = require("colors");
 const authRoutes = require("./routes/auth");
 const attendanceRoutes = require("./routes/attendanceRoutes");
-const student = require("./routes/studentRoutes");
+const studentRoutes = require("./routes/studentRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -26,13 +26,17 @@ mongoose.connection.once("open", () => {
 app.use(express.json());
 app.use(
   cors({
+<<<<<<< HEAD
     origin: "https://lnhs.vercel.app",
+=======
+    origin: ["https://lnhs.vercel.app", "http://localhost:5500"],
+>>>>>>> new_branch
   })
 );
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/student", student);
+app.use("/student", studentRoutes);
 app.use("/api/attendance", attendanceRoutes);
 
 //message 404
