@@ -51,7 +51,7 @@ const AttendanceDetails = () => {
       });
 
       if (result.isConfirmed) {
-        await deleteAttendance(studentId);
+        await deleteAttendance(lrn);
 
         fetchAttendance();
         Swal.fire("Deleted!", "Student has been deleted.", "success");
@@ -67,8 +67,8 @@ const AttendanceDetails = () => {
     }
     const dataForExport = attendance.map((record) => ({
       Date: formatDate(record.date),
-      "Time In": record.timeIn ? formatTime(record.timeIn) : "N/A",
-      "Time Out": record.timeOut ? formatTime(record.timeOut) : "N/A",
+      "Time In": record.timeIn ? formatTime(record.timeIn) : "No Time In",
+      "Time Out": record.timeOut ? formatTime(record.timeOut) : "No Time Out",
       Status: record.status,
     }));
 
@@ -151,10 +151,14 @@ const AttendanceDetails = () => {
                     <tr key={i} className="table-light">
                       <td>{formatDate(record.date)}</td>
                       <td>
-                        {record.timeIn ? formatTime(record.timeIn) : "N/A"}
+                        {record.timeIn
+                          ? formatTime(record.timeIn)
+                          : "No Time In"}
                       </td>
                       <td>
-                        {record.timeOut ? formatTime(record.timeOut) : "N/A"}
+                        {record.timeOut
+                          ? formatTime(record.timeOut)
+                          : "No Time Out"}
                       </td>
                       <td
                         className={`${

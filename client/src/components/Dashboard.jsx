@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
-import { getAllStudents, getStudentByTeacher } from "../services/student";
+import {
+  getAllAttendance,
+  getAllStudents,
+  getStudentByTeacher,
+} from "../services/student";
 import { Card } from "react-bootstrap";
 import CountUp from "react-countup";
 import { getCurrentPhilippineTime } from "../utils/getDate";
@@ -8,6 +12,9 @@ import Chart from "./Chart";
 const Dashboard = () => {
   const [totalStudents, setTotalStudents] = useState("");
   const [totalStudentFromTeacher, setTotalStudentFromTeacher] = useState("");
+  const [totalTimein, setTotalTimein] = useState(0);
+  const [totalTimeout, setTotalTimeout] = useState(0);
+
   // Retrieve the username from local storage
   const username = localStorage.getItem("username");
   const role = localStorage.getItem("role");
@@ -34,6 +41,38 @@ const Dashboard = () => {
       }
     };
     getStudentLengthFromTeacher();
+  }, []);
+
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      try {
+        const data = await getAllAttendance();
+        // Get the current date in 'MM/DD/YYYY' format
+        const currentDate = new Date().toLocaleDateString("en-US", {
+          timeZone: "Asia/Manila",
+        });
+
+        const todayTimeInCount = data.filter(
+          (record) =>
+            new Date(record.timeIn).toLocaleDateString("en-US", {
+              timeZone: "Asia/Manila",
+            }) === currentDate
+        ).length;
+
+        const todayTimeOutCount = data.filter(
+          (record) =>
+            new Date(record.timeOut).toLocaleDateString("en-US", {
+              timeZone: "Asia/Manila",
+            }) === currentDate
+        ).length;
+
+        setTotalTimein(todayTimeInCount);
+        setTotalTimeout(todayTimeOutCount);
+      } catch (error) {
+        console.log("Error", error);
+      }
+    };
+    fetchAttendance();
   }, []);
   return (
     <Layout>
@@ -74,7 +113,9 @@ const Dashboard = () => {
             <Card>
               <Card.Body>
                 <Card.Title>Today's Time In</Card.Title>
-                <Card.Text>0</Card.Text>
+                <Card.Text>
+                  {<CountUp end={totalTimein} duration={3} />}
+                </Card.Text>
               </Card.Body>
             </Card>
           </div>
@@ -82,7 +123,7 @@ const Dashboard = () => {
             <Card>
               <Card.Body>
                 <Card.Title>Today's Time Out</Card.Title>
-                <Card.Text>0</Card.Text>
+                {<CountUp end={totalTimeout} duration={3} />}
               </Card.Body>
             </Card>
           </div>

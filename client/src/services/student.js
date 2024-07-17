@@ -17,6 +17,20 @@ export const getAllStudents = async () => {
   }
 };
 
+export const getAllAttendance = async () => {
+  try {
+    const response = await axios.get("/api/attendance", {
+      headers: {
+        Authorization: getToken,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
 export const getAllUsers = async () => {
   try {
     const response = await axios.get("/api/auth/users", {
@@ -47,9 +61,9 @@ export const getStudentByTeacher = async () => {
   }
 };
 
-export const getStudentAttendance = async (studentId) => {
+export const getStudentAttendance = async (lrn) => {
   try {
-    const response = await axios.get(`/api/attendance/student/${studentId}`, {
+    const response = await axios.get(`/api/attendance/student/${lrn}`, {
       headers: {
         Authorization: getToken,
       },
@@ -75,7 +89,11 @@ export const getStudentData = async (studentId) => {
 
 export const deleteAttendance = async (studentId) => {
   try {
-    const response = await axios.delete(`/api/attendance/delete/${studentId}`);
+    const response = await axios.delete(`/api/attendance/delete/${studentId}`, {
+      headers: {
+        Authorization: getToken,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error:", error);

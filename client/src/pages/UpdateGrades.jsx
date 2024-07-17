@@ -131,7 +131,6 @@ const UpdateGrades = () => {
                   <th scope="col">Middle Name</th>
                   <th scope="col">Last Name</th>
                   <th scope="col">Grade</th>
-                  <th scope="col">Section</th>
                 </tr>
               </thead>
               <tbody>
@@ -144,7 +143,6 @@ const UpdateGrades = () => {
                       <td>{student.middleName}</td>
                       <td>{student.lastName}</td>
                       <td>{student.grade}</td>
-                      <td>{student.section}</td>
                     </tr>
                   ))}
               </tbody>

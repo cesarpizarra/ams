@@ -10,8 +10,9 @@ router.get(
   verifyToken,
   attendanceController.getAttendanceRecordsForStudent
 );
+router.get("/", verifyToken, attendanceController.getAllAttendance);
 router.delete(
-  "/delete/:id",
+  "/delete/:lrn",
   verifyToken,
   attendanceController.deleteAllRecordsForStudent
 );

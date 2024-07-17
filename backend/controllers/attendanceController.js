@@ -117,7 +117,7 @@ const getAttendanceRecordsForStudent = async (req, res) => {
     }
 
     // Find all attendance records for the student
-    const attendanceRecords = await Attendance.find({ student: student.lrn });
+    const attendanceRecords = await Attendance.find({ lrn: student.lrn });
 
     res.status(200).json({ student, attendanceRecords });
   } catch (error) {
@@ -128,17 +128,16 @@ const getAttendanceRecordsForStudent = async (req, res) => {
 
 const deleteAllRecordsForStudent = async (req, res) => {
   try {
-    const id = req.params.id;
-
+    const lrn = req.params.lrn;
     // Find the student details based on id
-    const student = await Student.findById(id);
+    const student = await Student.findOne({ lrn: lrn });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
     // Delete all attendance records for the student
-    await Attendance.deleteMany(id);
+    await Attendance.deleteMany({ lrn: lrn });
 
     res
       .status(200)
@@ -149,9 +148,24 @@ const deleteAllRecordsForStudent = async (req, res) => {
   }
 };
 
+// Get all attendance
+const getAllAttendance = async (req, res) => {
+  try {
+    const users = await Attendance.find();
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve attendance", error: error.message });
+  }
+};
+
 module.exports = {
   recordTimeIn,
   recordTimeOut,
   getAttendanceRecordsForStudent,
   deleteAllRecordsForStudent,
+  getAllAttendance,
 };
