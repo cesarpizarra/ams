@@ -11,11 +11,14 @@ const UpdateSection = () => {
   const [selectedStudents, setSelectedStudents] = useState([]);
 
   const fetchStudents = async () => {
+    setIsLoading(true);
     try {
       const { students } = await getAllStudents();
       setStudents(students);
+      setIsLoading(false);
     } catch (error) {
       console.log("Error fetching students", error);
+      setIsLoading(false);
     }
   };
 
@@ -111,7 +114,6 @@ const UpdateSection = () => {
         {/* Optionally, display a list of students here for review */}
         {isLoading ? (
           <div className="d-flex justify-content-center align-items-center mt-5 flex-column">
-            Updating...
             <div className="spinner-border " role="status">
               <span className="sr-only">Loading...</span>
             </div>
