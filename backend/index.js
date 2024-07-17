@@ -26,11 +26,7 @@ mongoose.connection.once("open", () => {
 app.use(express.json());
 app.use(
   cors({
-<<<<<<< HEAD
-    origin: "https://lnhs.vercel.app",
-=======
     origin: ["https://lnhs.vercel.app", "http://localhost:5500"],
->>>>>>> new_branch
   })
 );
 
