@@ -133,9 +133,7 @@ const UpdateSection = () => {
                 type="button"
                 className="btn btn-success"
                 onClick={handleUpdateSections}
-                disabled={
-                  selectedStudents.length === 0 || targetSection.trim() === ""
-                }
+                disabled={selectedStudents.length === 0}
               >
                 {isLoading ? "Updating..." : "Update Section"}
               </button>
