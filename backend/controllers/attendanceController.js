@@ -26,6 +26,8 @@ const recordTimeIn = async (req, res) => {
       // If no record exists for today, create a new one with timeIn
       const newRecord = new Attendance({
         lrn,
+        grade: student.grade,
+        section: student.section,
         timeIn: currentTime,
         date: currentDate,
         status: "Half Day", // Initially set as Half Day
@@ -78,6 +80,8 @@ const recordTimeOut = async (req, res) => {
       // If no record exists for today, create a new one with timeOut
       const newRecord = new Attendance({
         lrn,
+        grade: student.grade,
+        section: student.section,
         timeOut: currentTime,
         date: currentDate,
         status: "Half Day", // Initially set as Half Day when timing out directly
@@ -162,10 +166,29 @@ const getAllAttendance = async (req, res) => {
   }
 };
 
+// Get students
+const getStudentsAttendanceByTeacher = async (req, res) => {
+  try {
+    // Retrieve students based on the teacher's user ID, grade, and section
+    const studentAttendances = await Attendance.find({
+      grade: req.user.grade,
+      section: req.user.section,
+    });
+
+    res.status(200).json({ studentAttendances });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve students", error: error.message });
+  }
+};
+
 module.exports = {
   recordTimeIn,
   recordTimeOut,
   getAttendanceRecordsForStudent,
   deleteAllRecordsForStudent,
   getAllAttendance,
+  getStudentsAttendanceByTeacher,
 };

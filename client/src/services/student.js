@@ -61,6 +61,19 @@ export const getStudentByTeacher = async () => {
   }
 };
 
+export const getStudentAttendanceByTeacher = async () => {
+  try {
+    const response = await axios.get("/api/attendance/student", {
+      headers: {
+        Authorization: getToken,
+      },
+    });
+
+    return response.data.studentAttendances;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 export const getStudentAttendance = async (lrn) => {
   try {
     const response = await axios.get(`/api/attendance/student/${lrn}`, {

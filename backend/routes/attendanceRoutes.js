@@ -10,6 +10,11 @@ router.get(
   verifyToken,
   attendanceController.getAttendanceRecordsForStudent
 );
+router.get(
+  "/student",
+  verifyToken,
+  attendanceController.getStudentsAttendanceByTeacher
+);
 router.get("/", verifyToken, attendanceController.getAllAttendance);
 router.delete(
   "/delete/:lrn",
