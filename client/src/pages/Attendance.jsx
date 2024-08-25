@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Layout from "../components/Layout";
-import { getAllStudents } from "../services/student";
-import { CDBCard, CDBCardBody, CDBDataTable, CDBContainer } from "cdbreact";
+import React, { useEffect, useState } from 'react';
+import { FaPrint } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import Layout from '../components/Layout';
+import { getAllStudents, getStudentAttendance } from '../services/student';
+import { CDBCard, CDBCardBody, CDBContainer, CDBDataTable } from 'cdbreact';
+import { generatePrintHTML } from '../utils/printUtils';
+
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedGrade, setSelectedGrade] = useState("7");
-  const [selectedSection, setSelectedSection] = useState("1");
+  const [selectedGrade, setSelectedGrade] = useState('7');
+  const [selectedSection, setSelectedSection] = useState('1');
 
   const fetchStudent = async () => {
     try {
       const { students } = await getAllStudents();
-      setTimeout(() => {
-        setIsLoading(false);
-        setData(students);
-      }, 1000);
+      setData(students);
+      setIsLoading(false);
     } catch (error) {
-      console.log("Error", error);
+      console.log('Error', error);
       setIsLoading(false);
     }
   };
@@ -33,46 +34,34 @@ const Attendance = () => {
     );
   });
 
+  const handlePrint = async (lrn) => {
+    const student = data.find((student) => student.lrn === lrn);
+    if (student) {
+      try {
+        // Fetch attendance records for the selected student
+        const response = await getStudentAttendance(lrn);
+        const attendanceRecords = response; // Adjust according to your API response
+
+        const htmlContent = generatePrintHTML(student, attendanceRecords);
+        const printWindow = window.open('', '', 'height=800,width=1200');
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+      } catch (error) {
+        console.log('Error fetching attendance for print', error);
+      }
+    }
+  };
+
   const columns = [
-    {
-      label: "LRN No.",
-      field: "lrn",
-      width: 150,
-    },
-    {
-      label: "First Name",
-      field: "firstName",
-      width: 270,
-    },
-    {
-      label: "Middle Name",
-      field: "middleName",
-      width: 200,
-    },
-    {
-      label: "Last Name",
-      field: "lastName",
-      sort: "asc",
-      width: 100,
-    },
-    {
-      label: "Grade",
-      field: "grade",
-      sort: "disabled",
-      width: 100,
-    },
-    {
-      label: "Section",
-      field: "section",
-      sort: "disabled",
-      width: 100,
-    },
-    {
-      label: "Action",
-      field: "action",
-      sort: "disabled",
-      width: 100,
-    },
+    { label: 'LRN No.', field: 'lrn', width: 150 },
+    { label: 'First Name', field: 'firstName', width: 270 },
+    { label: 'Middle Name', field: 'middleName', width: 200 },
+    { label: 'Last Name', sort: 'asc', field: 'lastName', width: 100 },
+    { label: 'Grade', sort: 'disabled', field: 'grade', width: 100 },
+    { label: 'Section', sort: 'disabled', field: 'section', width: 100 },
+    { label: 'Action', sort: 'disabled', field: 'action', width: 100 },
   ];
 
   const rows = filteredData.map((student) => ({
@@ -83,14 +72,25 @@ const Attendance = () => {
     grade: student.grade,
     section: student.section,
     action: (
-      <Link
-        to={`/attendance/${student.firstName}/${student.middleName}/${student.lastName}/${student.grade}/${student.section}/${student.lrn}/${student._id}`}
-        className="btn btn-success"
-      >
-        View Details
-      </Link>
+      <div className="d-flex align-items-center gap-2">
+        <button
+          onClick={() => handlePrint(student.lrn)}
+          title="Print"
+          className="bg-primary p-2 rounded text-white btn"
+        >
+          <FaPrint />
+        </button>
+
+        <Link
+          to={`/attendance/${student.firstName}/${student.middleName}/${student.lastName}/${student.grade}/${student.section}/${student.lrn}/${student._id}`}
+          className="btn btn-success"
+        >
+          View
+        </Link>
+      </div>
     ),
   }));
+
   return (
     <Layout>
       <div className="vh-100 overflow-y-auto py-4">
@@ -120,7 +120,7 @@ const Attendance = () => {
                 </select>
               </div>
               <div className="col-md-2 d-flex align-items-center">
-                <label htmlFor="level" className="me-2">
+                <label htmlFor="section" className="me-2">
                   Section
                 </label>
                 <select
@@ -137,7 +137,7 @@ const Attendance = () => {
 
           {isLoading ? (
             <div className="d-flex align-items-center justify-content-around vh-100">
-              <div className="spinner-border " role="status">
+              <div className="spinner-border" role="status">
                 <span className="sr-only">Loading...</span>
               </div>
             </div>
@@ -146,63 +146,27 @@ const Attendance = () => {
               No list of students with the selected grade and section.
             </div>
           ) : (
-            // <table className="table text-nowrap text-center">
-            //   <thead>
-            //     <tr>
-            //       <th scope="col">LRN No.</th>
-            //       <th scope="col">First Name</th>
-            //       <th scope="col">Middle Name</th>
-            //       <th scope="col">Last Name</th>
-            //       <th scope="col">Grade</th>
-            //       <th scope="col">Section</th>
-            //       <th scope="col" id="printPageButton">
-            //         Action
-            //       </th>
-            //     </tr>
-            //   </thead>
-            //   <tbody>
-            //     {filteredData &&
-            //       filteredData.map((student, i) => (
-            //         <tr key={i} className="table-light">
-            //           <td>{student.lrn}</td>
-            //           <td>{student.firstName}</td>
-            //           <td>{student.middleName}</td>
-            //           <td>{student.lastName}</td>
-            //           <td>{student.grade}</td>
-            //           <td>{student.section}</td>
-            //           <td className="d-flex align-items-center justify-content-center gap-3">
-            //             <Link
-            //               to={`/attendance/${student.firstName}/${student.middleName}/${student.lastName}/${student.grade}/${student.section}/${student._id}`}
-            //             >
-            //               <button type="button" className="btn btn-success">
-            //                 View Details
-            //               </button>
-            //             </Link>
-            //           </td>
-            //         </tr>
-            //       ))}
-            //   </tbody>
-            // </table>
-
-            <CDBContainer>
-              <CDBCard>
-                <CDBCardBody>
-                  <CDBDataTable
-                    striped
-                    bordered
-                    hover
-                    entriesOptions={[5, 20, 25]}
-                    entries={5}
-                    pagesAmount={4}
-                    materialSearch={true}
-                    itemsPerPageSelect={true}
-                    itemsPerPage={5}
-                    responsive
-                    data={{ columns, rows }}
-                  />
-                </CDBCardBody>
-              </CDBCard>
-            </CDBContainer>
+            <>
+              <CDBContainer>
+                <CDBCard>
+                  <CDBCardBody>
+                    <CDBDataTable
+                      striped
+                      bordered
+                      hover
+                      entriesOptions={[5, 20, 25]}
+                      entries={5}
+                      pagesAmount={4}
+                      materialSearch={true}
+                      itemsPerPageSelect={true}
+                      itemsPerPage={5}
+                      responsive
+                      data={{ columns, rows }}
+                    />
+                  </CDBCardBody>
+                </CDBCard>
+              </CDBContainer>
+            </>
           )}
         </div>
       </div>

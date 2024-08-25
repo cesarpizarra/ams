@@ -1,28 +1,34 @@
-import React, { useState } from "react";
-import axios from "axios";
-
+import React, { useState } from 'react';
+import axios from 'axios';
+import { EncryptStorage } from 'encrypt-storage';
+const SECRET = import.meta.env.VITE_LOCAL_KEY;
+const encryptStorage = new EncryptStorage(SECRET, {
+  storageType: 'localStorage',
+});
 const LoginForm = () => {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoggingIn(true);
     try {
-      const response = await axios.post("/api/auth/login", {
+      const response = await axios.post('/api/auth/login', {
         username,
         password,
       });
       setTimeout(() => {
-        // Save the token to local storage
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("username", response.data.username);
-        localStorage.setItem("role", response.data.role);
-        window.location.href = "/dashboard";
+        localStorage.setItem('token', response.data.token);
+        encryptStorage.setItem('ascs', {
+          username: response.data.username,
+          role: response.data.role,
+        });
+        window.location.href = '/dashboard';
       }, 1500);
     } catch (error) {
-      console.log("Error: " + error);
+      console.log('Error: ' + error);
       setError(error.response.data.message);
       setIsLoggingIn(false);
     }
@@ -85,7 +91,7 @@ const LoginForm = () => {
                   </div>
                 )}
                 <button className="btn btn-success mt-4 btn-lg w-100 shadow-lg">
-                  {isLoggingIn ? "SIGNING IN..." : "SIGN IN"}
+                  {isLoggingIn ? 'SIGNING IN...' : 'SIGN IN'}
                 </button>
               </form>
             </div>

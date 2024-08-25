@@ -1,24 +1,39 @@
-import React from "react";
-import logo from "../assets/icon.png";
+import React, { useEffect, useState } from 'react';
+import logo from '../assets/icon.png';
 import {
   CDBSidebar,
   CDBSidebarContent,
   CDBSidebarHeader,
   CDBSidebarMenu,
   CDBSidebarMenuItem,
-} from "cdbreact";
-import ChangePassword from "./ChangePassword";
-import AddStudent from "./AddStudent";
-import { Link, useNavigate } from "react-router-dom";
+} from 'cdbreact';
+import ChangePassword from './ChangePassword';
+import AddStudent from './AddStudent';
+import { Link, useNavigate } from 'react-router-dom';
+import { EncryptStorage } from 'encrypt-storage';
+const SECRET = import.meta.env.VITE_LOCAL_KEY;
+const encryptStorage = new EncryptStorage(SECRET, {
+  storageType: 'localStorage',
+});
 const Layout = ({ children }) => {
   const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    navigate("/");
-  };
 
-  const role = localStorage.getItem("role");
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    // Retrieve data from localStorage
+    const data = encryptStorage.getItem('ascs');
+    if (data) {
+      setUserData(data);
+    } else {
+      console.log('No data found in storage');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('ascs');
+    navigate('/');
+  };
 
   return (
     <div className="w-auto d-flex vh-100">
@@ -27,50 +42,55 @@ const Layout = ({ children }) => {
       <CDBSidebar textColor="#fff" backgroundColor="#1d4ed8">
         <CDBSidebarHeader prefix={<i className="fa fa-bars" />}>
           <div className="d-flex align-items-center gap-3">
-            <img src={logo} alt="" style={{ width: "30px" }} />
+            <img src={logo} alt="" style={{ width: '30px' }} />
             <h6 className="mb-0">LNHS</h6>
           </div>
         </CDBSidebarHeader>
         <CDBSidebarContent>
           <CDBSidebarMenu>
-            <CDBSidebarMenuItem icon="th-large">
-              <Link to="/dashboard">Dashboard</Link>
-            </CDBSidebarMenuItem>
+            <Link to="/dashboard">
+              <CDBSidebarMenuItem icon="th-large">Dashboard</CDBSidebarMenuItem>
+            </Link>
+
             <span>
-              {role === "admin" ? (
-                <CDBSidebarMenuItem icon="calendar">
-                  <Link to="/attendance">Attendance</Link>
-                </CDBSidebarMenuItem>
+              {userData && userData.role === 'admin' ? (
+                <Link to="/attendance">
+                  <CDBSidebarMenuItem icon="calendar">
+                    Attendance
+                  </CDBSidebarMenuItem>
+                </Link>
               ) : (
-                ""
+                ''
               )}
             </span>
             <span>
-              {role === "admin" ? (
-                <CDBSidebarMenuItem icon="user">
-                  <Link to="/students">Students</Link>
-                </CDBSidebarMenuItem>
+              {userData && userData.role === 'admin' ? (
+                <Link to="/students">
+                  <CDBSidebarMenuItem icon="user">Students</CDBSidebarMenuItem>
+                </Link>
               ) : (
-                ""
+                ''
               )}
             </span>
             <span>
-              {role === "admin" ? (
-                <CDBSidebarMenuItem icon="user">
-                  <Link to="/teachers">Teachers</Link>
-                </CDBSidebarMenuItem>
+              {userData && userData.role === 'admin' ? (
+                <Link to="/teachers">
+                  <CDBSidebarMenuItem icon="user">Teachers</CDBSidebarMenuItem>
+                </Link>
               ) : (
-                ""
+                ''
               )}
             </span>
 
             <span>
-              {role === "teacher" ? (
-                <CDBSidebarMenuItem icon="user">
-                  <Link to="/student-list">Student List</Link>
-                </CDBSidebarMenuItem>
+              {userData && userData.role === 'teacher' ? (
+                <Link to="/student-list">
+                  <CDBSidebarMenuItem icon="user">
+                    Student List
+                  </CDBSidebarMenuItem>
+                </Link>
               ) : (
-                ""
+                ''
               )}
             </span>
             <CDBSidebarMenuItem icon="plus">

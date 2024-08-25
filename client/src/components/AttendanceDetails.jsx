@@ -1,16 +1,32 @@
-import React, { useEffect, useState } from "react";
-import Layout from "./Layout";
-import { Link, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import * as XLSX from "xlsx";
-import { deleteAttendance, getStudentAttendance } from "../services/student";
-import { formatDate, formatTime } from "../utils";
+import React, { useEffect, useState } from 'react';
+import Layout from './Layout';
+import { Link, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
+import { deleteAttendance, getStudentAttendance } from '../services/student';
+import { formatDate, formatTime } from '../utils';
+import { FaFileExcel, FaRegTrashAlt } from 'react-icons/fa';
+import { EncryptStorage } from 'encrypt-storage';
+const SECRET = import.meta.env.VITE_LOCAL_KEY;
+const encryptStorage = new EncryptStorage(SECRET, {
+  storageType: 'localStorage',
+});
 const AttendanceDetails = () => {
   const { firstName, middleName, lastName, grade, section, lrn, studentId } =
     useParams();
   const [attendance, setAttendance] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const role = localStorage.getItem("role");
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    // Retrieve data from localStorage
+    const data = encryptStorage.getItem('ascs');
+    if (data) {
+      setUserData(data);
+    } else {
+      console.log('No data found in storage');
+    }
+  }, []);
 
   const fetchAttendance = async () => {
     setIsLoading(true);
@@ -21,7 +37,7 @@ const AttendanceDetails = () => {
         setAttendance(response || []);
       }, 1500);
     } catch (error) {
-      console.log("Error fetch attendance", error);
+      console.log('Error fetch attendance', error);
       setIsLoading(false);
     }
   };
@@ -33,56 +49,56 @@ const AttendanceDetails = () => {
   const handleDeleteAttendance = async () => {
     if (attendance.length === 0) {
       return Swal.fire(
-        "Oops!",
-        "Unable to delete, no data available",
-        "warning"
+        'Oops!',
+        'Unable to delete, no data available',
+        'warning'
       );
     }
     try {
       // Use SweetAlert for confirmation
       const result = await Swal.fire({
-        title: "Are you sure?",
+        title: 'Are you sure?',
         text: "You won't be able to revert this!",
-        icon: "warning",
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
       });
 
       if (result.isConfirmed) {
         await deleteAttendance(lrn);
 
         fetchAttendance();
-        Swal.fire("Deleted!", "Student has been deleted.", "success");
+        Swal.fire('Deleted!', 'Student has been deleted.', 'success');
       }
     } catch (error) {
-      console.log("Error", error);
+      console.log('Error', error);
     }
   };
 
   const exportToExcel = () => {
     if (attendance.length === 0) {
-      return Swal.fire("Oops!", "No data, unable to export", "warning");
+      return Swal.fire('Oops!', 'No data, unable to export', 'warning');
     }
     const dataForExport = attendance.map((record) => ({
       Date: formatDate(record.date),
-      "Time In": record.timeIn ? formatTime(record.timeIn) : "No Time In",
-      "Time Out": record.timeOut ? formatTime(record.timeOut) : "No Time Out",
+      'Time In': record.timeIn ? formatTime(record.timeIn) : 'No Time In',
+      'Time Out': record.timeOut ? formatTime(record.timeOut) : 'No Time Out',
       Status: record.status,
     }));
 
     const ws = XLSX.utils.json_to_sheet(dataForExport);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
 
     const blob = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
     const fileName = `${firstName}_${middleName}_${lastName}_Attendance.xlsx`;
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = fileName;
     a.click();
@@ -92,7 +108,11 @@ const AttendanceDetails = () => {
     <Layout>
       <div className="container-fluid mt-5">
         <Link
-          to={`${role === "admin" ? "/attendance" : "/student-list"}`}
+          to={`${
+            userData && userData.role === 'admin'
+              ? '/attendance'
+              : '/student-list'
+          }`}
           className="btn btn-secondary"
         >
           Back
@@ -110,15 +130,17 @@ const AttendanceDetails = () => {
                 onClick={exportToExcel}
                 type="button"
                 className="btn btn-success"
+                title="Export to Excel"
               >
-                Export to excel
+                <FaFileExcel />
               </button>
               <button
                 onClick={handleDeleteAttendance}
                 type="button"
                 className="btn btn-danger"
+                title="Delete Records"
               >
-                Delete All Records
+                <FaRegTrashAlt />
               </button>
             </div>
           </div>
@@ -153,18 +175,18 @@ const AttendanceDetails = () => {
                       <td>
                         {record.timeIn
                           ? formatTime(record.timeIn)
-                          : "No Time In"}
+                          : 'No Time In'}
                       </td>
                       <td>
                         {record.timeOut
                           ? formatTime(record.timeOut)
-                          : "No Time Out"}
+                          : 'No Time Out'}
                       </td>
                       <td
                         className={`${
-                          record.status === "Present"
-                            ? "text-success"
-                            : "text-warning"
+                          record.status === 'Present'
+                            ? 'text-success'
+                            : 'text-warning'
                         }`}
                       >
                         {record.status}

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import Layout from "../components/Layout";
-import { getAllStudents } from "../services/student";
-import { Link } from "react-router-dom";
-import { MdOutlineSettings } from "react-icons/md";
-import { CDBCard, CDBCardBody, CDBDataTable, CDBContainer } from "cdbreact";
+import React, { useEffect, useState } from 'react';
+import Layout from '../components/Layout';
+import { getAllStudents } from '../services/student';
+import { Link } from 'react-router-dom';
+import { MdOutlineSettings } from 'react-icons/md';
+import { CDBCard, CDBCardBody, CDBDataTable, CDBContainer } from 'cdbreact';
 
 const Students = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedGrade, setSelectedGrade] = useState("7");
-  const [selectedSection, setSelectedSection] = useState("1");
+  const [selectedGrade, setSelectedGrade] = useState('7');
+  const [selectedSection, setSelectedSection] = useState('1');
   const fetchStudent = async () => {
     try {
       const { students } = await getAllStudents();
@@ -18,7 +18,7 @@ const Students = () => {
         setData(students);
       }, 1000);
     } catch (error) {
-      console.log("Error", error);
+      console.log('Error', error);
       setIsLoading(false);
     }
   };
@@ -36,42 +36,42 @@ const Students = () => {
 
   const columns = [
     {
-      label: "LRN No.",
-      field: "lrn",
+      label: 'LRN No.',
+      field: 'lrn',
       width: 150,
     },
     {
-      label: "First Name",
-      field: "firstName",
+      label: 'First Name',
+      field: 'firstName',
       width: 270,
     },
     {
-      label: "Middle Name",
-      field: "middleName",
+      label: 'Middle Name',
+      field: 'middleName',
       width: 200,
     },
     {
-      label: "Last Name",
-      field: "lastName",
-      sort: "asc",
+      label: 'Last Name',
+      field: 'lastName',
+      sort: 'asc',
       width: 100,
     },
     {
-      label: "Grade",
-      field: "grade",
-      sort: "disabled",
+      label: 'Grade',
+      field: 'grade',
+      sort: 'disabled',
       width: 100,
     },
     {
-      label: "Section",
-      field: "section",
-      sort: "disabled",
+      label: 'Section',
+      field: 'section',
+      sort: 'disabled',
       width: 100,
     },
     {
-      label: "Action",
-      field: "action",
-      sort: "disabled",
+      label: 'Action',
+      field: 'action',
+      sort: 'disabled',
       width: 100,
     },
   ];
@@ -168,57 +168,6 @@ const Students = () => {
               </div>
             </div>
           ) : (
-            // <table className="table text-nowrap text-center">
-            //   <thead>
-            //     <tr>
-            //       <th scope="col">LRN No.</th>
-            //       <th scope="col">First Name</th>
-            //       <th scope="col">Middle Name</th>
-            //       <th scope="col">Last Name</th>
-            //       <th scope="col">Grade</th>
-            //       <th scope="col">Section</th>
-            //       <th scope="col" id="printPageButton">
-            //         Action
-            //       </th>
-            //     </tr>
-            //   </thead>
-            //   <tbody>
-            //     {filteredData &&
-            //       filteredData.map((student, i) => (
-            //         <tr key={i} className="table-light">
-            //           <td>{student.lrn}</td>
-            //           <td>{student.firstName}</td>
-            //           <td>{student.middleName}</td>
-            //           <td>{student.lastName}</td>
-            //           <td>{student.grade}</td>
-            //           <td>{student.section}</td>
-            //           <td className="d-flex align-items-center justify-content-center gap-3">
-            //             <Link
-            //               to={`/update-student/${student._id}`}
-            //               className="bg-success text-white text-decoration-none px-3 rounded py-1"
-            //             >
-            //               <svg
-            //                 xmlns="http://www.w3.org/2000/svg"
-            //                 width="16"
-            //                 height="16"
-            //                 fill="currentColor"
-            //                 className="bi bi-pencil-square"
-            //                 viewBox="0 0 16 16"
-            //               >
-            //                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-            //                 <path
-            //                   fillRule="evenodd"
-            //                   d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-            //                 />
-            //               </svg>
-            //               Edit
-            //             </Link>
-            //           </td>
-            //         </tr>
-            //       ))}
-            //   </tbody>
-            // </table>
-
             <CDBContainer>
               <CDBCard>
                 <CDBCardBody>
