@@ -3,7 +3,7 @@ import { Table } from 'react-bootstrap';
 import { Student } from '../../types/user';
 import { FaPrint } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { getStudentAttendance } from '../../services/student';
+import { getStudentAttendance } from '../../services/studentService';
 import { generatePrintHTML } from '../../utils/printUtils';
 interface TableComponentProps {
   students: Student[];

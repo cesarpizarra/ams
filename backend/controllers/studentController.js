@@ -1,4 +1,4 @@
-const Student = require("../models/student");
+const Student = require('../models/student');
 // add a student
 const addStudent = async (req, res) => {
   try {
@@ -8,12 +8,12 @@ const addStudent = async (req, res) => {
     const { lrn, firstName, middleName, lastName, grade, section } = req.body;
 
     // Check if the user is an admin
-    if (req.user.role !== "admin") {
+    if (req.user.role !== 'admin') {
       // If not admin, check if the teacher is adding a student to their own grade and section
       if (grade !== teacherGrade || section !== teacherSection) {
         return res.status(403).json({
           message:
-            "Teachers can only add students to their own grade and section",
+            'Teachers can only add students to their own grade and section',
         });
       }
 
@@ -21,8 +21,16 @@ const addStudent = async (req, res) => {
       if (!grade || !section) {
         return res
           .status(400)
-          .json({ message: "Grade and section are required" });
+          .json({ message: 'Grade and section are required' });
       }
+    }
+
+    // Check if a student with the same LRN already exists
+    const existingStudent = await Student.findOne({ lrn });
+    if (existingStudent) {
+      return res.status(409).json({
+        message: 'A student with this LRN already exists',
+      });
     }
 
     // Create a new student
@@ -37,14 +45,15 @@ const addStudent = async (req, res) => {
 
     await student.save();
 
-    res.status(201).json({ message: "Student added successfully" });
+    res.status(201).json({ message: 'Student added successfully' });
   } catch (error) {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Student addition failed", error: error.message });
+      .json({ message: 'Student addition failed', error: error.message });
   }
 };
+
 // Get students
 const getStudentsByTeacher = async (req, res) => {
   try {
@@ -60,7 +69,7 @@ const getStudentsByTeacher = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Failed to retrieve students", error: error.message });
+      .json({ message: 'Failed to retrieve students', error: error.message });
   }
 };
 
@@ -74,7 +83,7 @@ const geAllStudents = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Failed to retrieve students", error: error.message });
+      .json({ message: 'Failed to retrieve students', error: error.message });
   }
 };
 
@@ -86,7 +95,7 @@ const getStudentById = async (req, res) => {
     const student = await Student.findById(id);
 
     if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      return res.status(404).json({ message: 'Student not found' });
     }
 
     res.status(200).json({ student });
@@ -94,27 +103,27 @@ const getStudentById = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Failed to retrieve student", error: error.message });
+      .json({ message: 'Failed to retrieve student', error: error.message });
   }
 };
 // Delete a student by studentId
 const deleteStudent = async (req, res) => {
   try {
-    const id = req.parmas.id;
+    const id = req.params.id;
 
-    // Delete the student by studentId and ensure it belongs to the teacher
-    const deletedStudent = await Student.findOneAndDelete(id);
+    // Delete the student by studentId
+    const result = await Student.deleteOne({ _id: id });
 
-    if (!deletedStudent) {
-      return res.status(404).json({ message: "Student not found" });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'Student not found' });
     }
 
-    res.status(200).json({ message: "Student deleted successfully" });
+    res.status(200).json({ message: 'Student deleted successfully' });
   } catch (error) {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Failed to delete student", error: error.message });
+      .json({ message: 'Failed to delete student', error: error.message });
   }
 };
 
@@ -128,14 +137,14 @@ const updateStudent = async (req, res) => {
     if (!grade || !section) {
       return res
         .status(400)
-        .json({ message: "Grade and section are required" });
+        .json({ message: 'Grade and section are required' });
     }
 
     // Find the student by studentId
     let student = await Student.findById(id);
 
     if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      return res.status(404).json({ message: 'Student not found' });
     }
 
     // Check if LRN already exists for another student
@@ -146,7 +155,7 @@ const updateStudent = async (req, res) => {
         existingStudentWithLRN &&
         existingStudentWithLRN._id.toString() !== id
       ) {
-        return res.status(400).json({ message: "LRN already exists" });
+        return res.status(400).json({ message: 'LRN already exists' });
       }
     }
     // Update student fields
@@ -160,12 +169,12 @@ const updateStudent = async (req, res) => {
     // Save the updated student
     await student.save();
 
-    res.status(200).json({ message: "Student updated successfully" });
+    res.status(200).json({ message: 'Student updated successfully' });
   } catch (error) {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Failed to update student", error: error.message });
+      .json({ message: 'Failed to update student', error: error.message });
   }
 };
 
@@ -185,10 +194,10 @@ const updateStudentGrade = async (req, res) => {
       message: `Updated ${updateResult.nModified} students from grade ${currentGrade} to grade ${targetGrade}`,
     });
   } catch (error) {
-    console.error("Error updating grades:", error);
+    console.error('Error updating grades:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to update student grades",
+      message: 'Failed to update student grades',
       error: error.message,
     });
   }
@@ -207,13 +216,13 @@ const updateStudentSectionById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Updated success",
+      message: 'Updated success',
     });
   } catch (error) {
-    console.error("Error updating sections:", error);
+    console.error('Error updating sections:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to update student sections",
+      message: 'Failed to update student sections',
       error: error.message,
     });
   }

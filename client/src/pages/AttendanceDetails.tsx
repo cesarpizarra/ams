@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { deleteAttendance } from '../services/student';
 import { formatDate, formatTime } from '../utils';
 import { FaFileExcel, FaRegTrashAlt } from 'react-icons/fa';
 import { EncryptStorage } from 'encrypt-storage';
@@ -10,6 +9,8 @@ import { useAttendanceDetails } from '../hooks/useAttendanceDetails';
 import Loader from '../common/Loader';
 const SECRET = import.meta.env.VITE_LOCAL_KEY;
 import { Table } from 'react-bootstrap';
+import { toast } from 'sonner';
+import { deleteAttendance } from '../services/attendanceService';
 const encryptStorage = new EncryptStorage(SECRET, {
   storageType: 'localStorage',
 });
@@ -25,12 +26,11 @@ const AttendanceDetails: React.FC = () => {
   }, []);
 
   const handleDeleteAttendance = async () => {
+    if (!lrn) {
+      return toast.warning('No Lrn found');
+    }
     if (!data || data?.length === 0) {
-      return Swal.fire(
-        'Oops!',
-        'Unable to delete, no data available',
-        'warning'
-      );
+      return toast.warning('No data to delete');
     }
     try {
       // Use SweetAlert for confirmation
@@ -47,7 +47,7 @@ const AttendanceDetails: React.FC = () => {
       if (result.isConfirmed) {
         await deleteAttendance(lrn);
 
-        Swal.fire('Deleted!', 'Student has been deleted.', 'success');
+        toast.success('Attendance has been deleted');
       }
     } catch (error) {
       console.log('Error', error);
@@ -56,7 +56,7 @@ const AttendanceDetails: React.FC = () => {
 
   const exportToExcel = () => {
     if (!data || data?.length === 0) {
-      return Swal.fire('Oops!', 'No data, unable to export', 'warning');
+      return toast.warning('No data, unable to export');
     }
     const dataForExport =
       data?.map((record) => ({

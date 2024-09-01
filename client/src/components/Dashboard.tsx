@@ -1,11 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Layout from '../layout/MainLayout';
-import {
-  getAllAttendance,
-  getAllStudents,
-  getStudentAttendanceByTeacher,
-  getStudentByTeacher,
-} from '../services/student';
+import { useEffect, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import CountUp from 'react-countup';
 import { getCurrentPhilippineTime } from '../utils/getDate';
@@ -13,6 +6,8 @@ import Chart from './chart/Chart';
 import { EncryptStorage } from 'encrypt-storage';
 import { useFetchStudent } from '../hooks/useFetchStudent';
 import Loader from '../common/Loader';
+import { useAttendance } from '../hooks/useAttendance';
+import { getStudentByTeacher } from '../services/teacherService';
 const SECRET = import.meta.env.VITE_LOCAL_KEY;
 const encryptStorage = new EncryptStorage(SECRET, {
   storageType: 'localStorage',
@@ -24,13 +19,19 @@ interface UserData {
 }
 
 const Dashboard = () => {
-  const [totalStudentFromTeacher, setTotalStudentFromTeacher] = useState('');
-  const [totalTimein, setTotalTimein] = useState(0);
-  const [totalStudentTimein, setTotalStudentTimein] = useState(0);
-  const [totalStudentTimeout, setTotalStudentTimeout] = useState(0);
-  const [totalTimeout, setTotalTimeout] = useState(0);
   const [userData, setUserData] = useState<UserData | undefined>(undefined);
-  const { data: students, isLoading, error } = useFetchStudent();
+  const [totalStudentFromTeacher, setTotalStudentFromTeacher] = useState(0);
+  const {
+    data: students,
+    isLoading: studentsLoading,
+    error: studentsError,
+  } = useFetchStudent();
+  const {
+    data: attendanceData,
+    isLoading: attendanceLoading,
+    error: attendanceError,
+  } = useAttendance(userData?.role || '');
+
   useEffect(() => {
     // Retrieve data from localStorage
     const data = encryptStorage.getItem('ascs');
@@ -42,71 +43,30 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAttendance = async () => {
+    const getStudentLengthFromTeacher = async () => {
       try {
-        const data = await getAllAttendance();
-        // Get the current date in 'MM/DD/YYYY' format
-        const currentDate = new Date().toLocaleDateString('en-US', {
-          timeZone: 'Asia/Manila',
-        });
-
-        const todayTimeInCount = data.filter(
-          (record) =>
-            new Date(record.timeIn).toLocaleDateString('en-US', {
-              timeZone: 'Asia/Manila',
-            }) === currentDate
-        ).length;
-
-        const todayTimeOutCount = data.filter(
-          (record) =>
-            new Date(record.timeOut).toLocaleDateString('en-US', {
-              timeZone: 'Asia/Manila',
-            }) === currentDate
-        ).length;
-
-        setTotalTimein(todayTimeInCount);
-        setTotalTimeout(todayTimeOutCount);
+        const response = await getStudentByTeacher();
+        setTotalStudentFromTeacher(response.length);
       } catch (error) {
         console.log('Error', error);
       }
     };
-    fetchAttendance();
+    getStudentLengthFromTeacher();
   }, []);
 
-  useEffect(() => {
-    const getTotalAttendanceTeacher = async () => {
-      try {
-        const data = await getStudentAttendanceByTeacher();
-        // Get the current date in 'MM/DD/YYYY' format
-        const currentDate = new Date().toLocaleDateString('en-US', {
-          timeZone: 'Asia/Manila',
-        });
+  if (studentsLoading || attendanceLoading) return <Loader />;
+  if (studentsError || attendanceError)
+    return (
+      <p>
+        {(studentsError as Error).message || (attendanceError as Error).message}
+      </p>
+    );
 
-        const todayTimeInCount = data.filter(
-          (record) =>
-            new Date(record.timeIn).toLocaleDateString('en-US', {
-              timeZone: 'Asia/Manila',
-            }) === currentDate
-        ).length;
-
-        const todayTimeOutCount = data.filter(
-          (record) =>
-            new Date(record.timeOut).toLocaleDateString('en-US', {
-              timeZone: 'Asia/Manila',
-            }) === currentDate
-        ).length;
-
-        setTotalStudentTimein(todayTimeInCount);
-        setTotalStudentTimeout(todayTimeOutCount);
-      } catch (error) {
-        console.log('Error', error);
-      }
-    };
-    getTotalAttendanceTeacher();
-  }, []);
-
-  if (isLoading) return <Loader />;
-  if (error) return <p>{(error as Error).message}</p>;
+  // const totalAttendanceFromTeacher = attendanceData?.teacher?.timeInCount || 0;
+  const totalStudentTimein = attendanceData?.teacher?.timeInCount || 0;
+  const totalStudentTimeout = attendanceData?.teacher?.timeOutCount || 0;
+  const totalTimein = attendanceData?.admin?.timeInCount || 0;
+  const totalTimeout = attendanceData?.admin?.timeOutCount || 0;
   return (
     <div className="container mt-5">
       <div className="d-md-flex align-items-center justify-content-between">
@@ -136,7 +96,14 @@ const Dashboard = () => {
                   {<CountUp end={students?.length ?? 0} duration={3} />}
                 </Card.Text>
               ) : (
-                <Card.Text>{<CountUp end={22} duration={3} />}</Card.Text>
+                <Card.Text>
+                  {
+                    <CountUp
+                      end={Number(totalStudentFromTeacher)}
+                      duration={3}
+                    />
+                  }
+                </Card.Text>
               )}
             </Card.Body>
           </Card>

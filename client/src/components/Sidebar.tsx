@@ -14,6 +14,9 @@ const encryptStorage = new EncryptStorage(SECRET, {
 
 const Sidebar: React.FC = () => {
   const [userData, setUserData] = useState<any | null>(null);
+  const [show, setShow] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,8 +33,10 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <AddStudent />
-      <ChangePassword />
+      {showAdd && (
+        <AddStudent show={showAdd} onClose={() => setShowAdd(false)} />
+      )}
+      {show && <ChangePassword show={show} onClose={() => setShow(false)} />}
       <Navbar expand="lg" className="navbar navbar-dark bg-primary p-4">
         <Container fluid>
           <Navbar.Brand href="#">
@@ -73,16 +78,10 @@ const Sidebar: React.FC = () => {
                 </Link>
               )}
               <NavDropdown title="Settings" id="navbarScrollingDropdown">
-                <NavDropdown.Item
-                  data-bs-toggle="modal"
-                  data-bs-target="#addStudentModal"
-                >
+                <NavDropdown.Item onClick={() => setShowAdd(true)}>
                   Add Student
                 </NavDropdown.Item>
-                <NavDropdown.Item
-                  data-bs-toggle="modal"
-                  data-bs-target="#changePasswordModal"
-                >
+                <NavDropdown.Item onClick={() => setShow(true)}>
                   Change Password
                 </NavDropdown.Item>
                 <NavDropdown.Divider />

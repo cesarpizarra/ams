@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Teacher } from '../types/user';
-import { getAllTeachers } from '../services/student';
+import { getAllTeachers } from '../services/teacherService';
 
 export function useFetchTeacher() {
   const { data, isLoading, error } = useQuery<Teacher[]>({

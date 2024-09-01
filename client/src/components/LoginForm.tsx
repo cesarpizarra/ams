@@ -9,12 +9,10 @@ const encryptStorage = new EncryptStorage(SECRET, {
 });
 const LoginForm = () => {
   const [username, setUsername] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setIsLoggingIn(true);
     try {
       const response = await axios.post('/api/auth/login', {
         username,
@@ -31,7 +29,6 @@ const LoginForm = () => {
     } catch (error: any) {
       console.log('Error: ' + error);
       toast.error(error.response.data.message);
-      setIsLoggingIn(false);
     }
   };
 
@@ -92,7 +89,7 @@ const LoginForm = () => {
                           className="btn btn-primary btn-lg"
                           type="submit"
                         >
-                          {isLoggingIn ? 'Logging in' : 'Login'}
+                          Login
                         </button>
                       </div>
                     </div>

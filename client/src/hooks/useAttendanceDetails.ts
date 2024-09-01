@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getStudentAttendance } from '../services/student';
+import { getStudentAttendance } from '../services/studentService';
 import { Attendance } from '../types/attendance';
 
 export function useAttendanceDetails(lrn?: string) {

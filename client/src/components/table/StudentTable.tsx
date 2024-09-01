@@ -2,12 +2,45 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 import { Student } from '../../types/user';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+import Swal from 'sweetalert2';
+import { deleteStudent } from '../../services/studentService';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TableComponentProps {
   students: Student[];
 }
 
 const StudentTable: React.FC<TableComponentProps> = ({ students }) => {
+  const queryClient = useQueryClient();
+
+  const handleDeleteStudent = async (studenId: string) => {
+    if (!studenId) {
+      return toast.warning('No ID found');
+    }
+
+    try {
+      // Use SweetAlert for confirmation
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+      });
+
+      if (result.isConfirmed) {
+        await deleteStudent(studenId);
+        queryClient.invalidateQueries({ queryKey: ['students'] });
+        toast.success('Student has been deleted');
+      }
+    } catch (error) {
+      console.log('Error', error);
+    }
+  };
+
   return (
     <Table striped bordered hover variant="light">
       <thead>
@@ -53,7 +86,12 @@ const StudentTable: React.FC<TableComponentProps> = ({ students }) => {
                   Edit
                 </Link>
 
-                <button className="btn btn-danger">
+                <button
+                  className="btn btn-danger"
+                  onClick={() =>
+                    student._id && handleDeleteStudent(student._id)
+                  }
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 448 512"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getStudentData, updateStudent } from '../services/student';
+import { getStudentData, updateStudent } from '../services/studentService';
 import Swal from 'sweetalert2';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
