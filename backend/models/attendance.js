@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const attendanceSchema = new mongoose.Schema({
   lrn: { type: String },
@@ -10,4 +10,4 @@ const attendanceSchema = new mongoose.Schema({
   status: { type: String },
 });
 
-module.exports = mongoose.model("Attendance", attendanceSchema);
+module.exports = mongoose.model('Attendance', attendanceSchema);

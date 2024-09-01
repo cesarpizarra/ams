@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { getToken } from '../utils/getToken';
-export const getAllStudents = async () => {
+import { Student, Teacher } from '../types/user';
+import { Attendance } from '../types/attendance';
+
+export const getAllStudents = async (): Promise<Student[]> => {
   try {
     const response = await axios.get('/student/all/students', {
       headers: {
@@ -8,16 +11,14 @@ export const getAllStudents = async () => {
       },
     });
 
-    const students = response.data || [];
-    const length = students.length;
-
-    return { students, length };
+    return response.data;
   } catch (error) {
     console.error('Error:', error);
+    throw Error;
   }
 };
 
-export const getAllAttendance = async () => {
+export const getAllAttendance = async (): Promise<Attendance[]> => {
   try {
     const response = await axios.get('/api/attendance', {
       headers: {
@@ -28,10 +29,11 @@ export const getAllAttendance = async () => {
     return response.data;
   } catch (error) {
     console.error('Error:', error);
+    throw Error;
   }
 };
 
-export const getAllUsers = async () => {
+export const getAllTeachers = async (): Promise<Teacher[]> => {
   try {
     const response = await axios.get('/api/auth/users', {
       headers: {
@@ -42,10 +44,11 @@ export const getAllUsers = async () => {
     return response.data;
   } catch (error) {
     console.error('Error:', error);
+    throw Error;
   }
 };
 
-export const getStudentByTeacher = async () => {
+export const getStudentByTeacher = async (): Promise<Student[]> => {
   try {
     const response = await axios.get('/student/students', {
       headers: {
@@ -53,15 +56,16 @@ export const getStudentByTeacher = async () => {
       },
     });
 
-    const students = response.data.students;
-    const length = students.length;
-    return { students, length };
+    return response.data.students;
   } catch (error) {
     console.error('Error:', error);
+    throw Error;
   }
 };
 
-export const getStudentAttendanceByTeacher = async () => {
+export const getStudentAttendanceByTeacher = async (): Promise<
+  Attendance[]
+> => {
   try {
     const response = await axios.get('/api/attendance/student', {
       headers: {
@@ -72,9 +76,10 @@ export const getStudentAttendanceByTeacher = async () => {
     return response.data.studentAttendances;
   } catch (error) {
     console.error('Error:', error);
+    throw Error;
   }
 };
-export const getStudentAttendance = async (lrn) => {
+export const getStudentAttendance = async (lrn: string) => {
   try {
     const response = await axios.get(`/api/attendance/student/${lrn}`, {
       headers: {
@@ -87,7 +92,7 @@ export const getStudentAttendance = async (lrn) => {
   }
 };
 
-export const getStudentData = async (studentId) => {
+export const getStudentData = async (studentId: string) => {
   try {
     const response = await axios.get(`/student/${studentId}`, {
       headers: {
@@ -100,7 +105,7 @@ export const getStudentData = async (studentId) => {
   }
 };
 
-export const deleteAttendance = async (studentId) => {
+export const deleteAttendance = async (studentId: string) => {
   try {
     const response = await axios.delete(`/api/attendance/delete/${studentId}`, {
       headers: {
@@ -113,7 +118,7 @@ export const deleteAttendance = async (studentId) => {
   }
 };
 
-export const updateStudent = async (studentId, updatedData) => {
+export const updateStudent = async (studentId: string, updatedData: any) => {
   try {
     const response = await axios.put(
       `/student/update/${studentId}`,
@@ -125,13 +130,16 @@ export const updateStudent = async (studentId, updatedData) => {
       }
     );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error.response?.data?.message || 'An error occurred';
     throw new Error(errorMessage);
   }
 };
 
-export const updateGrades = async (currentGrade, targetGrade) => {
+export const updateGrades = async (
+  currentGrade: string,
+  targetGrade: string
+) => {
   try {
     const response = await axios.put(
       '/student/update-grades',
@@ -151,7 +159,10 @@ export const updateGrades = async (currentGrade, targetGrade) => {
   }
 };
 
-export const updateSection = async (studentIds, targetSection) => {
+export const updateSection = async (
+  studentIds: string,
+  targetSection: string
+) => {
   try {
     const response = await axios.put(
       '/student/update-section',
@@ -171,7 +182,7 @@ export const updateSection = async (studentIds, targetSection) => {
   }
 };
 
-export const deleteStudent = async (studentId) => {
+export const deleteStudent = async (studentId: string) => {
   try {
     const response = await axios.delete(`/student/${studentId}`);
     return response.data;

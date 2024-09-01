@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { getToken } from "../utils/getToken";
+import { useState } from 'react';
+import axios from 'axios';
+import { getToken } from '../utils/getToken';
+import { toast } from 'sonner';
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
+    currentPassword: '',
+    newPassword: '',
   });
   const [message, setMessage] = useState(null);
   const handleChange = (e) => {
@@ -20,21 +21,21 @@ const ChangePassword = () => {
     setMessage(null);
 
     try {
-      await axios.post("/api/auth/update-password", formData, {
+      await axios.post('/api/auth/update-password', formData, {
         headers: {
           Authorization: getToken,
         },
       });
 
       setFormData({
-        currentPassword: "",
-        newPassword: "",
+        currentPassword: '',
+        newPassword: '',
       });
 
-      setMessage("Password changed successfully!");
+      toast.success('Password changed successfully!');
     } catch (error) {
-      console.error("Error:", error);
-      setMessage(error.response.data.message);
+      console.error('Error:', error);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -91,9 +92,9 @@ const ChangePassword = () => {
                   {message ? (
                     <div
                       className={
-                        message.includes("successfully")
-                          ? "alert alert-success"
-                          : "alert alert-danger"
+                        message.includes('successfully')
+                          ? 'alert alert-success'
+                          : 'alert alert-danger'
                       }
                       role="alert"
                     >

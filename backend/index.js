@@ -1,11 +1,11 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const colors = require("colors");
-const authRoutes = require("./routes/auth");
-const attendanceRoutes = require("./routes/attendanceRoutes");
-const studentRoutes = require("./routes/studentRoutes");
-require("dotenv").config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const colors = require('colors');
+const authRoutes = require('./routes/auth');
+const attendanceRoutes = require('./routes/attendanceRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+require('dotenv').config();
 
 const app = express();
 
@@ -15,29 +15,29 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true,
 });
 mongoose.connection.on(
-  "error",
-  console.error.bind(console, "MongoDB connection error:")
+  'error',
+  console.error.bind(console, 'MongoDB connection error:')
 );
-mongoose.connection.once("open", () => {
-  console.log("Connected to MongoDB".underline.cyan);
+mongoose.connection.once('open', () => {
+  console.log('Connected to MongoDB'.underline.cyan);
 });
 
 // Middleware
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://lnhs.vercel.app", "http://localhost:5500"],
+    origin: ['https://lnhs.vercel.app', 'http://localhost:5173'],
   })
 );
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/student", studentRoutes);
-app.use("/api/attendance", attendanceRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/student', studentRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 //message 404
 app.use((req, res, next) => {
-  res.status(404).send("Page not Found!");
+  res.status(404).send('Page not Found!');
 });
 
 const port = process.env.PORT || 3000;

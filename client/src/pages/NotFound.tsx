@@ -1,5 +1,4 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 const NotFound = () => {
   return (
     <section className="py-3 py-md-5 min-vh-100 d-flex justify-content-center align-items-center">
