@@ -14,7 +14,7 @@ An efficient system for tracking and managing student attendance, developed with
 Clone the Project
 
 ```bash
-    git clone https://github.com/cesarpizarra/lnhs
+    git clone https://github.com/cesarpizarra/ams
 ```
 
 ## Navigate to the Project Directory
