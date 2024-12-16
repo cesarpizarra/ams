@@ -1,4 +1,4 @@
-# LNHS Attendance Monitoring
+# Simple Attendance Monitoring System
 
 An efficient system for tracking and managing student attendance, developed with the MERN stack (MongoDB, Express.js, React, Node.js). It features a QR code scanning app developed separately in Java.
 
